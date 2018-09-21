@@ -1,5 +1,6 @@
 using FaceClientSDK.Domain.Face;
-using FaceClientSDK.Domain.FaceList;
+using DomainFaceList = FaceClientSDK.Domain.FaceList;
+using DomainLargePersonGroupPerson = FaceClientSDK.Domain.LargePersonGroupPerson;
 using FaceClientSDK.Tests.Fixtures;
 using FaceClientSDK.Tests.Helpers;
 using Newtonsoft.Json;
@@ -19,6 +20,7 @@ namespace FaceClientSDK.Tests
 
             APIReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
             APIReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
+            TimeoutHelper.Timeout = faceAPISettingsFixture.Timeout;
         }
 
         [Fact]
@@ -54,7 +56,7 @@ namespace FaceClientSDK.Tests
                     var creation_result = APIReference.Instance.FaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
                     System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
 
-                    AddFaceResult addface_result = null;
+                    DomainFaceList.AddFaceResult addface_result = null;
                     if (creation_result)
                     {
                         dynamic jUserData = new JObject();
@@ -80,6 +82,60 @@ namespace FaceClientSDK.Tests
                 {
                     var deletion_result = APIReference.Instance.FaceListInstance.DeleteAsync(identifier).Result;
                     System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
+                }
+
+                Assert.True(result != null);
+            });
+        }
+
+        [Fact]
+        public void VerifyAsyncTest()
+        {
+            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            {
+                VerifyResult result = null;
+                var identifier = System.Guid.NewGuid().ToString();
+                var personId = string.Empty;
+                try
+                {
+                    var creation_group_result = APIReference.Instance.LargePersonGroupInstance.CreateAsync(identifier, identifier, identifier).Result;
+                    System.Diagnostics.Trace.Write($"Creation Result: {creation_group_result}");
+
+                    var creation_person_result = APIReference.Instance.LargePersonGroupPersonInstance.CreateAsync(identifier, identifier, identifier).Result;
+                    personId = creation_person_result.personId;
+                    System.Diagnostics.Trace.Write($"Creation Result: {creation_person_result.personId}");
+
+                    DomainLargePersonGroupPerson.AddFaceResult addface_result = null;
+                    if ((creation_person_result != null) && creation_group_result)
+                    {
+                        dynamic jUserData = new JObject();
+                        jUserData.UserDataSample = "User Data Sample";
+                        var rUserData = JsonConvert.SerializeObject(jUserData);
+
+                        addface_result = APIReference.Instance.LargePersonGroupPersonInstance.AddFaceAsync(identifier, personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
+
+                        if (addface_result != null)
+                        {
+                            List<DetectResult> detection_result = APIReference.Instance.FaceInstance.DetectAsync(faceAPISettingsFixture.TestImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true).Result;
+
+                            if (detection_result != null)
+                            {
+                                result = APIReference.Instance.FaceInstance.VerifyAsync(string.Empty, string.Empty, detection_result[0].faceId, string.Empty, identifier, personId).Result;
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    throw;
+                }
+                finally
+                {
+                    var deletion_person_result = APIReference.Instance.LargePersonGroupPersonInstance.DeleteAsync(identifier, personId).Result;
+                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_person_result}");
+
+                    var deletion_group_result = APIReference.Instance.LargePersonGroupInstance.DeleteAsync(identifier).Result;
+                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_group_result}");
                 }
 
                 Assert.True(result != null);

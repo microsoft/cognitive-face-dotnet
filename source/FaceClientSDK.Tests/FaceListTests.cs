@@ -18,6 +18,7 @@ namespace FaceClientSDK.Tests
 
             APIReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
             APIReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
+            TimeoutHelper.Timeout = faceAPISettingsFixture.Timeout;
         }
 
         [Fact]
