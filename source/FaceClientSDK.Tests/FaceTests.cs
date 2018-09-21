@@ -1,11 +1,10 @@
 using FaceClientSDK.Domain.Face;
 using FaceClientSDK.Domain.FaceList;
 using FaceClientSDK.Tests.Fixtures;
+using FaceClientSDK.Tests.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace FaceClientSDK.Tests
@@ -25,9 +24,8 @@ namespace FaceClientSDK.Tests
         [Fact]
         public void DetectAsyncTest()
         {
-            var timeout = 10;
-            var task = Task.Run(()=> {
-
+            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            {
                 List<DetectResult> result = null;
 
                 try
@@ -41,30 +39,13 @@ namespace FaceClientSDK.Tests
 
                 Assert.True(result != null);
             });
-            var wait = Task.WaitAll(new[] { task }, TimeSpan.FromSeconds(timeout));
-
-            if (task.Exception != null)
-            {
-                if (task.Exception.InnerExceptions.Count == 1)
-                {
-                    throw task.Exception.InnerExceptions[0];
-                }
-
-                throw task.Exception;
-            }
-
-            if (!wait)
-            {
-                throw new TimeoutException($"Not completed.");
-            }
         }
 
         [Fact]
         public void FindSimilarAsyncTest()
         {
-            var timeout = 10;
-            var task = Task.Run(() => {
-
+            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            {
                 List<FindSimilarResult> result = null;
                 var identifier = System.Guid.NewGuid().ToString();
 
@@ -103,22 +84,6 @@ namespace FaceClientSDK.Tests
 
                 Assert.True(result != null);
             });
-            var wait = Task.WaitAll(new[] { task }, TimeSpan.FromSeconds(timeout));
-
-            if (task.Exception != null)
-            {
-                if (task.Exception.InnerExceptions.Count == 1)
-                {
-                    throw task.Exception.InnerExceptions[0];
-                }
-
-                throw task.Exception;
-            }
-
-            if (!wait)
-            {
-                throw new TimeoutException($"Not completed.");
-            }
         }
     }
 }
