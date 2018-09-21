@@ -8,7 +8,7 @@ namespace FaceClientSDK.Interfaces
     {
         Task<AddFaceResult> AddFaceAsync(string largePersonGroupId, string personId, string url, string userData, string targetFace);
 
-        Task<bool> CreateAsync(string largePersonGroupId, string name, string userData);
+        Task<CreateResult> CreateAsync(string largePersonGroupId, string name, string userData);
 
         Task<bool> DeleteAsync(string largePersonGroupId, string personId);
 
