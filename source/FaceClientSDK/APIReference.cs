@@ -143,6 +143,53 @@ namespace FaceClientSDK
                 return result;
             }
         }
+
+        public async Task<DomainFace.VerifyResult> VerifyAsync(string faceId1, string faceId2, string faceId, string personGroupId, string largePersonGroupId, string personId)
+        {
+            dynamic body = new JObject();
+
+            if (faceId1 != string.Empty)
+                body.faceId1 = faceId1;
+
+            if (faceId2 != string.Empty)
+                body.faceId2 = faceId2;
+
+            if (faceId != string.Empty)
+                body.faceId = faceId;
+
+            if (personGroupId != string.Empty)
+                body.personGroupId = personGroupId;
+
+            if (largePersonGroupId != string.Empty)
+                body.largePersonGroupId = largePersonGroupId;
+
+            if (personId != string.Empty)
+                body.personId = personId;
+
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.PostAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/verify", queryString);
+
+                DomainFace.VerifyResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainFace.VerifyResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
     }
 
     public class FaceList : IFaceList
