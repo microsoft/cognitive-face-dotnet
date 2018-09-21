@@ -944,7 +944,7 @@ namespace FaceClientSDK
             }
         }
 
-        public async Task<bool> CreateAsync(string largePersonGroupId, string name, string userData)
+        public async Task<DomainLargePersonGroupPerson.CreateResult> CreateAsync(string largePersonGroupId, string name, string userData)
         {
             dynamic body = new JObject();
             body.name = name;
@@ -954,12 +954,13 @@ namespace FaceClientSDK
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
-                var response = await client.PutAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/largepersongroups/{largePersonGroupId}/persons", queryString);
+                var response = await client.PostAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/largepersongroups/{largePersonGroupId}/persons", queryString);
 
-                bool result = false;
+                DomainLargePersonGroupPerson.CreateResult result = null;
                 if (response.IsSuccessStatusCode)
                 {
-                    result = true;
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainLargePersonGroupPerson.CreateResult>(json);
                 }
                 else
                 {
