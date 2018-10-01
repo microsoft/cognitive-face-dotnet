@@ -125,7 +125,7 @@ namespace FaceClientSDK.Tests
                     throw;
                 }
 
-                Assert.True(result != false);
+                Assert.True(result);
             });
         }
 
@@ -173,7 +173,7 @@ namespace FaceClientSDK.Tests
                     System.Diagnostics.Trace.Write($"Deletion Result: {deletion_group_result}");
                 }
 
-                Assert.True(result != false);
+                Assert.True(result);
             });
         }
 
@@ -335,7 +335,7 @@ namespace FaceClientSDK.Tests
                     System.Diagnostics.Trace.Write($"Deletion Result: {deletion_group_result}");
                 }
 
-                Assert.True(result != false);
+                Assert.True(result);
             });
         }
 
@@ -383,7 +383,7 @@ namespace FaceClientSDK.Tests
                     System.Diagnostics.Trace.Write($"Deletion Result: {deletion_group_result}");
                 }
 
-                Assert.True(result != false);
+                Assert.True(result);
             });
         }
     }
