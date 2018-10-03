@@ -9,7 +9,6 @@ namespace FaceClientSDK.Tests.Fixtures
         public string FaceAPIKey { get; set; }
         public string FaceAPIZone { get; set; }
         public string TestImageUrl { get; set; }
-        public int Timeout { get; set; }
 
         public FaceAPISettingsFixture()
         {
@@ -21,7 +20,6 @@ namespace FaceClientSDK.Tests.Fixtures
             FaceAPIKey = config.GetSection("general:FaceAPIKey").Value;
             FaceAPIZone = config.GetSection("general:FaceAPIZone").Value;
             TestImageUrl = config.GetSection("general:TestImageUrl").Value;
-            Timeout = Convert.ToInt32(config.GetSection("general:Timeout").Value);
         }
 
         public void Dispose()
