@@ -1,6 +1,5 @@
 using FaceClientSDK.Domain.LargeFaceList;
 using FaceClientSDK.Tests.Fixtures;
-using FaceClientSDK.Tests.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -18,435 +17,411 @@ namespace FaceClientSDK.Tests
 
             APIReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
             APIReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
-            TimeoutHelper.Timeout = faceAPISettingsFixture.Timeout;
         }
 
         [Fact]
-        public void AddFaceAsyncTest()
+        public async void AddFaceAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            AddFaceResult result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                AddFaceResult result = null;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
 
-                try
+                if (creation_result)
                 {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    if (creation_result)
+                    result = await APIReference.Instance.LargeFaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
+
+            Assert.True(result != null);
+        }
+
+        [Fact]
+        public async void CreateAsyncTest()
+        {
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
+            {
+                result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async void DeleteAsyncTest()
+        {
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
+            {
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+
+                result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
+            catch
+            {
+                throw;
+            }
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async void DeleteFaceAsyncTest()
+        {
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
+            {
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+
+                AddFaceResult addface_result = null;
+                if (creation_result)
+                {
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
+
+                    addface_result = await APIReference.Instance.LargeFaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+
+                    if (addface_result != null)
+                        result = await APIReference.Instance.LargeFaceList.DeleteFaceAsync(identifier, addface_result.persistedFaceId);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async void GetAsyncTest()
+        {
+            GetResult result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
+            {
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+
+                if (creation_result)
+                    result = await APIReference.Instance.LargeFaceList.GetAsync(identifier);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
+
+            Assert.True(result != null);
+        }
+
+        [Fact]
+        public async void GetFaceAsyncTest()
+        {
+            GetFaceResult result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
+            {
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+
+                AddFaceResult addface_result = null;
+                if (creation_result)
+                {
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
+
+                    addface_result = await APIReference.Instance.LargeFaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+
+                    if (addface_result != null)
+                        result = await APIReference.Instance.LargeFaceList.GetFaceAsync(identifier, addface_result.persistedFaceId);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
+
+            Assert.True(result != null);
+        }
+
+        [Fact]
+        public async void GetTrainingStatusAsyncTest()
+        {
+            GetTrainingStatusResult result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
+            {
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+
+                AddFaceResult addface_result = null;
+                if (creation_result)
+                {
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
+
+                    addface_result = await APIReference.Instance.LargeFaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+
+                    if (addface_result != null)
                     {
-                        dynamic jUserData = new JObject();
-                        jUserData.UserDataSample = "User Data Sample";
-                        var rUserData = JsonConvert.SerializeObject(jUserData);
+                        bool training_result = false;
+                        training_result = await APIReference.Instance.LargeFaceList.TrainAsync(identifier);
 
-                        result = APIReference.Instance.LargeFaceListInstance.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
-                    }
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
-        }
-
-        [Fact]
-        public void CreateAsyncTest()
-        {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
-            {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
-
-                try
-                {
-                    result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {result}");
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result);
-            });
-        }
-
-        [Fact]
-        public void DeleteAsyncTest()
-        {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
-            {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
-
-                try
-                {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {result}");
-                }
-                catch
-                {
-                    throw;
-                }
-
-                Assert.True(result);
-            });
-        }
-
-        [Fact]
-        public void DeleteFaceAsyncTest()
-        {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
-            {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
-
-                try
-                {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    AddFaceResult addface_result = null;
-                    if (creation_result)
-                    {
-                        dynamic jUserData = new JObject();
-                        jUserData.UserDataSample = "User Data Sample";
-                        var rUserData = JsonConvert.SerializeObject(jUserData);
-
-                        addface_result = APIReference.Instance.LargeFaceListInstance.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
-
-                        if (addface_result != null)
-                            result = APIReference.Instance.LargeFaceListInstance.DeleteFaceAsync(identifier, addface_result.persistedFaceId).Result;
-                    }
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result);
-            });
-        }
-
-        [Fact]
-        public void GetAsyncTest()
-        {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
-            {
-                GetResult result = null;
-                var identifier = System.Guid.NewGuid().ToString();
-
-                try
-                {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    if (creation_result)
-                        result = APIReference.Instance.LargeFaceListInstance.GetAsync(identifier).Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
-        }
-
-        [Fact]
-        public void GetFaceAsyncTest()
-        {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
-            {
-                GetFaceResult result = null;
-                var identifier = System.Guid.NewGuid().ToString();
-
-                try
-                {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    AddFaceResult addface_result = null;
-                    if (creation_result)
-                    {
-                        dynamic jUserData = new JObject();
-                        jUserData.UserDataSample = "User Data Sample";
-                        var rUserData = JsonConvert.SerializeObject(jUserData);
-
-                        addface_result = APIReference.Instance.LargeFaceListInstance.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
-
-                        if (addface_result != null)
-                            result = APIReference.Instance.LargeFaceListInstance.GetFaceAsync(identifier, addface_result.persistedFaceId).Result;
-                    }
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
-        }
-
-        [Fact]
-        public void GetTrainingStatusAsyncTest()
-        {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
-            {
-                GetTrainingStatusResult result = null;
-                var identifier = System.Guid.NewGuid().ToString();
-
-                try
-                {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    AddFaceResult addface_result = null;
-                    if (creation_result)
-                    {
-                        dynamic jUserData = new JObject();
-                        jUserData.UserDataSample = "User Data Sample";
-                        var rUserData = JsonConvert.SerializeObject(jUserData);
-
-                        addface_result = APIReference.Instance.LargeFaceListInstance.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
-
-                        if (addface_result != null)
+                        if (training_result)
                         {
-                            bool training_result = false;
-                            training_result = APIReference.Instance.LargeFaceListInstance.TrainAsync(identifier).Result;
-                            System.Diagnostics.Trace.Write($"Train Result: {training_result}");
+                            while (true)
+                            {
+                                System.Threading.Tasks.Task.Delay(1000).Wait();
+                                result = await APIReference.Instance.LargeFaceList.GetTrainingStatusAsync(identifier);
 
-                            if (training_result)
-                                result = APIReference.Instance.LargeFaceListInstance.GetTrainingStatusAsync(identifier).Result;
+                                if (result.status == "running")
+                                {
+                                    continue;
+                                }
+                                else if (result.status == "succeeded")
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }                            
+                    }
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
+
+            Assert.True(result != null);
+        }
+
+        [Fact]
+        public async void ListAsyncTest()
+        {
+            List<ListResult> result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
+            {
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+
+                if (creation_result)
+                    result = await APIReference.Instance.LargeFaceList.ListAsync(string.Empty, 1000);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
+
+            Assert.True(result != null);
+        }
+
+        [Fact]
+        public async void ListFaceAsyncTest()
+        {
+            List<ListFaceResult> result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
+            {
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+
+                AddFaceResult addface_result = null;
+                if (creation_result)
+                {
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
+
+                    addface_result = await APIReference.Instance.LargeFaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+
+                    if (addface_result != null)
+                        result = await APIReference.Instance.LargeFaceList.ListFaceAsync(identifier);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
+
+            Assert.True(result != null);
+        }
+
+        [Fact]
+        public async void TrainAsyncTest()
+        {
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
+            {
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+
+                AddFaceResult addface_result = null;
+                if (creation_result)
+                {
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
+
+                    addface_result = await APIReference.Instance.LargeFaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+
+                    if (addface_result != null)
+                    {
+                        result = await APIReference.Instance.LargeFaceList.TrainAsync(identifier);
+
+                        while (true)
+                        {
+                            System.Threading.Tasks.Task.Delay(1000).Wait();
+                            var status = await APIReference.Instance.LargeFaceList.GetTrainingStatusAsync(identifier);
+
+                            if (status.status == "running")
+                            {
+                                continue;
+                            }
+                            else if (status.status == "succeeded")
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
                     }
                 }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
 
-                Assert.True(result != null);
-            });
+            Assert.True(result);
         }
 
         [Fact]
-        public void ListAsyncTest()
+        public async void UpdateAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                List<ListResult> result = null;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
+                System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
 
-                try
-                {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                if (creation_result)
+                    result = await APIReference.Instance.LargeFaceList.UpdateAsync(identifier, "Name", "User Data Sample");
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
 
-                    if (creation_result)
-                        result = APIReference.Instance.LargeFaceListInstance.ListAsync(string.Empty, 1000).Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
+            Assert.True(result);
         }
 
         [Fact]
-        public void ListFaceAsyncTest()
+        public async void UpdateFaceAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                List<ListFaceResult> result = null;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
 
-                try
+                AddFaceResult addface_result = null;
+                if (creation_result)
                 {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    AddFaceResult addface_result = null;
-                    if (creation_result)
-                    {
-                        dynamic jUserData = new JObject();
-                        jUserData.UserDataSample = "User Data Sample";
-                        var rUserData = JsonConvert.SerializeObject(jUserData);
+                    addface_result = await APIReference.Instance.LargeFaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
 
-                        addface_result = APIReference.Instance.LargeFaceListInstance.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
-
-                        if (addface_result != null)
-                            result = APIReference.Instance.LargeFaceListInstance.ListFaceAsync(identifier).Result;
-                    }
+                    if (addface_result != null)
+                        result = await APIReference.Instance.LargeFaceList.UpdateFaceAsync(identifier, addface_result.persistedFaceId, "User Data Sample");
                 }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
-        }
-
-        [Fact]
-        public void TrainAsyncTest()
-        {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            }
+            catch
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
-
-                try
-                {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    AddFaceResult addface_result = null;
-                    if (creation_result)
-                    {
-                        dynamic jUserData = new JObject();
-                        jUserData.UserDataSample = "User Data Sample";
-                        var rUserData = JsonConvert.SerializeObject(jUserData);
-
-                        addface_result = APIReference.Instance.LargeFaceListInstance.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
-
-                        if (addface_result != null)
-                        {
-                            result = APIReference.Instance.LargeFaceListInstance.TrainAsync(identifier).Result;
-                            System.Diagnostics.Trace.Write($"Train Result: {result}");
-                        }
-                    }
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result);
-            });
-        }
-
-        [Fact]
-        public void UpdateAsyncTest()
-        {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+                throw;
+            }
+            finally
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
+                var deletion_result = await APIReference.Instance.LargeFaceList.DeleteAsync(identifier);
+            }
 
-                try
-                {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    if (creation_result)
-                        result = APIReference.Instance.LargeFaceListInstance.UpdateAsync(identifier, "Name", "User Data Sample").Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result);
-            });
-        }
-
-        [Fact]
-        public void UpdateFaceAsyncTest()
-        {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
-            {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
-
-                try
-                {
-                    var creation_result = APIReference.Instance.LargeFaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    AddFaceResult addface_result = null;
-                    if (creation_result)
-                    {
-                        dynamic jUserData = new JObject();
-                        jUserData.UserDataSample = "User Data Sample";
-                        var rUserData = JsonConvert.SerializeObject(jUserData);
-
-                        addface_result = APIReference.Instance.LargeFaceListInstance.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
-
-                        if (addface_result != null)
-                            result = APIReference.Instance.LargeFaceListInstance.UpdateFaceAsync(identifier, addface_result.persistedFaceId, "User Data Sample").Result;
-                    }
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargeFaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result);
-            });
+            Assert.True(result);
         }
     }
 }

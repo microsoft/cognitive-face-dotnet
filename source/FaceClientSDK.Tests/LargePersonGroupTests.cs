@@ -1,6 +1,5 @@
 using FaceClientSDK.Domain.LargePersonGroup;
 using FaceClientSDK.Tests.Fixtures;
-using FaceClientSDK.Tests.Helpers;
 using System.Collections.Generic;
 using Xunit;
 
@@ -16,213 +15,211 @@ namespace FaceClientSDK.Tests
 
             APIReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
             APIReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
-            TimeoutHelper.Timeout = faceAPISettingsFixture.Timeout;
         }
 
         [Fact]
-        public void CreateAsyncTest()
+        public async void CreateAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
+                result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+            }
 
-                try
-                {
-                    result = APIReference.Instance.LargePersonGroupInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {result}");
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargePersonGroupInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result);
-            });
+            Assert.True(result);
         }
 
         [Fact]
-        public void DeleteAsyncTest()
+        public async void DeleteAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+            }
+            catch
+            {
+                throw;
+            }
 
-                try
-                {
-                    var creation_result = APIReference.Instance.LargePersonGroupInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    result = APIReference.Instance.LargePersonGroupInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {result}");
-                }
-                catch
-                {
-                    throw;
-                }
-
-                Assert.True(result);
-            });
+            Assert.True(result);
         }
 
         [Fact]
-        public void GetAsyncTest()
+        public async void GetAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            GetResult result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                GetResult result = null;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                try
-                {
-                    var creation_result = APIReference.Instance.LargePersonGroupInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                if (creation_result)
+                    result = await APIReference.Instance.LargePersonGroup.GetAsync(identifier);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+            }
 
-                    if (creation_result)
-                        result = APIReference.Instance.LargePersonGroupInstance.GetAsync(identifier).Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargePersonGroupInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
+            Assert.True(result != null);
         }
 
         [Fact]
-        public void GetTrainingStatusAsyncTest()
+        public async void GetTrainingStatusAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            GetTrainingStatusResult result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                GetTrainingStatusResult result = null;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                try
+                bool training_result = false;
+                training_result = await APIReference.Instance.LargePersonGroup.TrainAsync(identifier);
+
+                if (training_result)
                 {
-                    var creation_result = APIReference.Instance.LargePersonGroupInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                    while (true)
+                    {
+                        System.Threading.Tasks.Task.Delay(1000).Wait();
+                        result = await APIReference.Instance.LargePersonGroup.GetTrainingStatusAsync(identifier);
 
-                    bool training_result = false;
-                    training_result = APIReference.Instance.LargePersonGroupInstance.TrainAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Train Result: {training_result}");
+                        if (result.status == "running")
+                        {
+                            continue;
+                        }
+                        else if (result.status == "succeeded")
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+            }
 
-                    if (training_result)
-                        result = APIReference.Instance.LargePersonGroupInstance.GetTrainingStatusAsync(identifier).Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargePersonGroupInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
+            Assert.True(result != null);
         }
 
         [Fact]
-        public void ListAsyncTest()
+        public async void ListAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            List<ListResult> result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                List<ListResult> result = null;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                try
-                {
-                    var creation_result = APIReference.Instance.LargePersonGroupInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                if (creation_result)
+                    result = await APIReference.Instance.LargePersonGroup.ListAsync(string.Empty, 1000);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+            }
 
-                    if (creation_result)
-                        result = APIReference.Instance.LargePersonGroupInstance.ListAsync(string.Empty, 1000).Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargePersonGroupInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
+            Assert.True(result != null);
         }
 
         [Fact]
-        public void TrainAsyncTest()
+        public async void TrainAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                result = await APIReference.Instance.LargePersonGroup.TrainAsync(identifier);
 
-                try
+                while (true)
                 {
-                    var creation_result = APIReference.Instance.LargePersonGroupInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                    System.Threading.Tasks.Task.Delay(1000).Wait();
+                    var status = await APIReference.Instance.LargePersonGroup.GetTrainingStatusAsync(identifier);
 
-                    result = APIReference.Instance.LargePersonGroupInstance.TrainAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Train Result: {result}");
+                    if (status.status == "running")
+                    {
+                        continue;
+                    }
+                    else if (status.status == "succeeded")
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargePersonGroupInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+            }
 
-                Assert.True(result);
-            });
+            Assert.True(result);
         }
 
         [Fact]
-        public void UpdateAsyncTest()
+        public async void UpdateAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                try
-                {
-                    var creation_result = APIReference.Instance.LargePersonGroupInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                if (creation_result)
+                    result = await APIReference.Instance.LargePersonGroup.UpdateAsync(identifier, "Name", "User Data Sample");
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+            }
 
-                    if (creation_result)
-                        result = APIReference.Instance.LargePersonGroupInstance.UpdateAsync(identifier, "Name", "User Data Sample").Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.LargePersonGroupInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result);
-            });
+            Assert.True(result);
         }
     }
 }
