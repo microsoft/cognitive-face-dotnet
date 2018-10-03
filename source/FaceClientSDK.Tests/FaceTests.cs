@@ -92,7 +92,7 @@ namespace FaceClientSDK.Tests
                 personId = creation_person_result.personId;
 
                 DomainLargePersonGroupPerson.AddFaceResult addface_result = null;
-                if ((creation_person_result != null) && creation_group_result)
+                if (creation_group_result)
                 {
                     dynamic jUserData = new JObject();
                     jUserData.UserDataSample = "User Data Sample";
