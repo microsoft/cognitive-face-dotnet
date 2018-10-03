@@ -1,6 +1,5 @@
 using FaceClientSDK.Domain.FaceList;
 using FaceClientSDK.Tests.Fixtures;
-using FaceClientSDK.Tests.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -18,225 +17,188 @@ namespace FaceClientSDK.Tests
 
             APIReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
             APIReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
-            TimeoutHelper.Timeout = faceAPISettingsFixture.Timeout;
         }
 
         [Fact]
-        public void AddFaceAsyncTest()
+        public async void AddFaceAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            AddFaceResult result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                AddFaceResult result = null;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
-                try
+                if (creation_result)
                 {
-                    var creation_result = APIReference.Instance.FaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    if (creation_result)
-                    {
-                        dynamic jUserData = new JObject();
-                        jUserData.UserDataSample = "User Data Sample";
-                        var rUserData = JsonConvert.SerializeObject(jUserData);
+                    result = await APIReference.Instance.FaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+            }
 
-                        result = APIReference.Instance.FaceListInstance.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
-                    }
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.FaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
+            Assert.True(result != null);
         }
 
         [Fact]
-        public void CreateAsyncTest()
+        public async void CreateAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
+                result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+            }
 
-                try
-                {
-                    result = APIReference.Instance.FaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {result}");
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.FaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result);
-            });
+            Assert.True(result);
         }
 
         [Fact]
-        public void DeleteAsyncTest()
+        public async void DeleteAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+                result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+            }
+            catch
+            {
+                throw;
+            }
 
-                try
-                {
-                    var creation_result = APIReference.Instance.FaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
-
-                    result = APIReference.Instance.FaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {result}");
-                }
-                catch
-                {
-                    throw;
-                }
-
-                Assert.True(result);
-            });
+            Assert.True(result);
         }
 
         [Fact]
-        public void DeleteFaceAsyncTest()
+        public async void DeleteFaceAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
-                try
+                AddFaceResult addface_result = null;
+                if (creation_result)
                 {
-                    var creation_result = APIReference.Instance.FaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    AddFaceResult addface_result = null;
-                    if (creation_result)
-                    {
-                        dynamic jUserData = new JObject();
-                        jUserData.UserDataSample = "User Data Sample";
-                        var rUserData = JsonConvert.SerializeObject(jUserData);
+                    addface_result = await APIReference.Instance.FaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
 
-                        addface_result = APIReference.Instance.FaceListInstance.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty).Result;
-
-                        if (addface_result != null)
-                            result = APIReference.Instance.FaceListInstance.DeleteFaceAsync(identifier, addface_result.persistedFaceId).Result;
-                    }
+                    if (addface_result != null)
+                        result = await APIReference.Instance.FaceList.DeleteFaceAsync(identifier, addface_result.persistedFaceId);
                 }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.FaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+            }
 
-                Assert.True(result);
-            });
+            Assert.True(result);
         }
 
         [Fact]
-        public void GetAsyncTest()
+        public async void GetAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            GetResult result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                GetResult result = null;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
-                try
-                {
-                    var creation_result = APIReference.Instance.FaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                if (creation_result)
+                    result = await APIReference.Instance.FaceList.GetAsync(identifier);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+            }
 
-                    if (creation_result)
-                        result = APIReference.Instance.FaceListInstance.GetAsync(identifier).Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.FaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
+            Assert.True(result != null);
         }
 
         [Fact]
-        public void ListAsyncTest()
+        public async void ListAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            List<ListResult> result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                List<ListResult> result = null;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
-                try
-                {
-                    var creation_result = APIReference.Instance.FaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                if (creation_result)
+                    result = await APIReference.Instance.FaceList.ListAsync();
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+            }
 
-                    if (creation_result)
-                        result = APIReference.Instance.FaceListInstance.ListAsync().Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.FaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result != null);
-            });
+            Assert.True(result != null);
         }
 
         [Fact]
-        public void UpdateAsyncTest()
+        public async void UpdateAsyncTest()
         {
-            TimeoutHelper.ThrowExceptionInTimeout(() =>
+            bool result = false;
+            var identifier = System.Guid.NewGuid().ToString();
+
+            try
             {
-                bool result = false;
-                var identifier = System.Guid.NewGuid().ToString();
+                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
-                try
-                {
-                    var creation_result = APIReference.Instance.FaceListInstance.CreateAsync(identifier, identifier, identifier).Result;
-                    System.Diagnostics.Trace.Write($"Creation Result: {creation_result}");
+                if (creation_result)
+                    result = await APIReference.Instance.FaceList.UpdateAsync(identifier, "Name", "User Data Sample");
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+            }
 
-                    if (creation_result)
-                        result = APIReference.Instance.FaceListInstance.UpdateAsync(identifier, "Name", "User Data Sample").Result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    var deletion_result = APIReference.Instance.FaceListInstance.DeleteAsync(identifier).Result;
-                    System.Diagnostics.Trace.Write($"Deletion Result: {deletion_result}");
-                }
-
-                Assert.True(result);
-            });
+            Assert.True(result);
         }
     }
 }
