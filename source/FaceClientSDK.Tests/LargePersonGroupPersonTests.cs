@@ -33,7 +33,7 @@ namespace FaceClientSDK.Tests
                 var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
-                if ((creation_person_result != null) && creation_group_result)
+                if (creation_group_result)
                 {
                     dynamic jUserData = new JObject();
                     jUserData.UserDataSample = "User Data Sample";
@@ -120,7 +120,7 @@ namespace FaceClientSDK.Tests
                 personId = creation_person_result.personId;
 
                 AddFaceResult addface_result = null;
-                if ((creation_person_result != null) && creation_group_result)
+                if (creation_group_result)
                 {
                     dynamic jUserData = new JObject();
                     jUserData.UserDataSample = "User Data Sample";
@@ -159,7 +159,7 @@ namespace FaceClientSDK.Tests
                 var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
-                if ((creation_person_result != null) && creation_group_result)
+                if (creation_group_result)
                     result = await APIReference.Instance.LargePersonGroupPerson.GetAsync(identifier, personId);
             }
             catch
@@ -190,7 +190,7 @@ namespace FaceClientSDK.Tests
                 personId = creation_person_result.personId;
 
                 AddFaceResult addface_result = null;
-                if ((creation_person_result != null) && creation_group_result)
+                if (creation_group_result)
                 {
                     dynamic jUserData = new JObject();
                     jUserData.UserDataSample = "User Data Sample";
@@ -229,7 +229,7 @@ namespace FaceClientSDK.Tests
                 var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
-                if ((creation_person_result != null) && creation_group_result)
+                if (creation_group_result)
                     result = await APIReference.Instance.LargePersonGroupPerson.ListAsync(identifier, string.Empty, 1000);
             }
             catch
@@ -259,7 +259,7 @@ namespace FaceClientSDK.Tests
                 var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
-                if ((creation_person_result != null) && creation_group_result)
+                if (creation_group_result)
                     result = await APIReference.Instance.LargePersonGroupPerson.UpdateAsync(identifier, personId, "Name", "User Data Sample");
             }
             catch
@@ -290,7 +290,7 @@ namespace FaceClientSDK.Tests
                 personId = creation_person_result.personId;
 
                 AddFaceResult addface_result = null;
-                if ((creation_person_result != null) && creation_group_result)
+                if (creation_group_result)
                 {
                     dynamic jUserData = new JObject();
                     jUserData.UserDataSample = "User Data Sample";
