@@ -21,11 +21,11 @@ namespace FaceClientSDK
 
         public static string FaceAPIKey { get; set; }
         public static string FaceAPIZone { get; set; }
-        public Face FaceInstance { get; set; } = Face.Instance;
-        public FaceList FaceListInstance { get; set; } = FaceList.Instance;
-        public LargeFaceList LargeFaceListInstance { get; set; } = LargeFaceList.Instance;
-        public LargePersonGroup LargePersonGroupInstance { get; set; } = LargePersonGroup.Instance;
-        public LargePersonGroupPerson LargePersonGroupPersonInstance { get; set; } = LargePersonGroupPerson.Instance;
+        public Face Face { get; set; } = Face.Instance;
+        public FaceList FaceList { get; set; } = FaceList.Instance;
+        public LargeFaceList LargeFaceList { get; set; } = LargeFaceList.Instance;
+        public LargePersonGroup LargePersonGroup { get; set; } = LargePersonGroup.Instance;
+        public LargePersonGroupPerson LargePersonGroupPerson { get; set; } = LargePersonGroupPerson.Instance;
 
         APIReference()
         {
