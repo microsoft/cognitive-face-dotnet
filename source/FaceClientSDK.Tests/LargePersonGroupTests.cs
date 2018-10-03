@@ -97,7 +97,26 @@ namespace FaceClientSDK.Tests
                 training_result = await APIReference.Instance.LargePersonGroup.TrainAsync(identifier);
 
                 if (training_result)
-                    result = await APIReference.Instance.LargePersonGroup.GetTrainingStatusAsync(identifier);
+                {
+                    while (true)
+                    {
+                        System.Threading.Tasks.Task.Delay(1000).Wait();
+                        result = await APIReference.Instance.LargePersonGroup.GetTrainingStatusAsync(identifier);
+
+                        if (result.status == "running")
+                        {
+                            continue;
+                        }
+                        else if (result.status == "succeeded")
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
             }
             catch
             {
@@ -146,6 +165,25 @@ namespace FaceClientSDK.Tests
             {
                 var creation_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
                 result = await APIReference.Instance.LargePersonGroup.TrainAsync(identifier);
+
+                while (true)
+                {
+                    System.Threading.Tasks.Task.Delay(1000).Wait();
+                    var status = await APIReference.Instance.LargePersonGroup.GetTrainingStatusAsync(identifier);
+
+                    if (status.status == "running")
+                    {
+                        continue;
+                    }
+                    else if (status.status == "succeeded")
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
             catch
             {
