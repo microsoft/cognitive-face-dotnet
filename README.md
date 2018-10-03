@@ -1,4 +1,11 @@
 
+## Latest Builds
+
+Channel  | Core SDK 
+-------- | :------------: 
+development | [![Build status](https://technical-poets.visualstudio.com/cognitive-face-dotnet/_apis/build/status/cognitive-face-dotnet-development-CI)](https://technical-poets.visualstudio.com/cognitive-face-dotnet/_build/latest?definitionId=22)
+master | [![Build status](https://technical-poets.visualstudio.com/cognitive-face-dotnet/_apis/build/status/cognitive-face-dotnet-master-CI)](https://technical-poets.visualstudio.com/cognitive-face-dotnet/_build/latest?definitionId=23)
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
