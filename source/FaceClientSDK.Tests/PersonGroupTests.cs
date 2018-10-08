@@ -105,14 +105,6 @@ namespace FaceClientSDK.Tests
 
                         if (result.status == "running")
                         {
-                            continue;
-                        }
-                        else if (result.status == "succeeded")
-                        {
-                            break;
-                        }
-                        else
-                        {
                             break;
                         }
                     }
@@ -172,14 +164,6 @@ namespace FaceClientSDK.Tests
                     var status = await APIReference.Instance.PersonGroup.GetTrainingStatusAsync(identifier);
 
                     if (status.status == "running")
-                    {
-                        continue;
-                    }
-                    else if (status.status == "succeeded")
-                    {
-                        break;
-                    }
-                    else
                     {
                         break;
                     }
