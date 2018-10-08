@@ -103,7 +103,7 @@ namespace FaceClientSDK.Tests
                         System.Threading.Tasks.Task.Delay(1000).Wait();
                         result = await APIReference.Instance.PersonGroup.GetTrainingStatusAsync(identifier);
 
-                        if (result.status == "running")
+                        if (result.status != "running")
                         {
                             break;
                         }
@@ -163,7 +163,7 @@ namespace FaceClientSDK.Tests
                     System.Threading.Tasks.Task.Delay(1000).Wait();
                     var status = await APIReference.Instance.PersonGroup.GetTrainingStatusAsync(identifier);
 
-                    if (status.status == "running")
+                    if (status.status != "running")
                     {
                         break;
                     }
