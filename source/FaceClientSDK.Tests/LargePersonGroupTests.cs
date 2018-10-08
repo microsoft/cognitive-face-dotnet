@@ -103,7 +103,7 @@ namespace FaceClientSDK.Tests
                         System.Threading.Tasks.Task.Delay(1000).Wait();
                         result = await APIReference.Instance.LargePersonGroup.GetTrainingStatusAsync(identifier);
 
-                        if (result.status == "running")
+                        if (result.status != "running")
                         {
                             break;
                         }
