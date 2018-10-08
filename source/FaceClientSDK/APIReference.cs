@@ -5,6 +5,8 @@ using DomainFaceList = FaceClientSDK.Domain.FaceList;
 using DomainLargeFaceList = FaceClientSDK.Domain.LargeFaceList;
 using DomainLargePersonGroup = FaceClientSDK.Domain.LargePersonGroup;
 using DomainLargePersonGroupPerson = FaceClientSDK.Domain.LargePersonGroupPerson;
+using DomainPersonGroup = FaceClientSDK.Domain.PersonGroup;
+using DomainPersonGroupPerson = FaceClientSDK.Domain.PersonGroupPerson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -26,6 +28,8 @@ namespace FaceClientSDK
         public LargeFaceList LargeFaceList { get; set; } = LargeFaceList.Instance;
         public LargePersonGroup LargePersonGroup { get; set; } = LargePersonGroup.Instance;
         public LargePersonGroupPerson LargePersonGroupPerson { get; set; } = LargePersonGroupPerson.Instance;
+        public PersonGroup PersonGroup { get; set; } = PersonGroup.Instance;
+        public PersonGroupPerson PersonGroupPerson { get; set; } = PersonGroupPerson.Instance;
 
         APIReference()
         {
@@ -1174,6 +1178,469 @@ namespace FaceClientSDK
             {
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
                 var response = await client.PatchAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/largepersongroups/{largePersonGroupId}/persons/{personId}/persistedfaces/{persistedFaceId}", queryString);
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+    }
+
+    public class PersonGroup : IPersonGroup
+    {
+        private static PersonGroup instance = null;
+        private static readonly object padlock = new object();
+
+        PersonGroup()
+        {
+            if (string.IsNullOrEmpty(APIReference.FaceAPIKey))
+                throw new Exception("FaceAPIKey required by: APIReference.FaceAPIKey");
+
+            if (string.IsNullOrEmpty(APIReference.FaceAPIZone))
+                throw new Exception("FaceAPIZone required by: APIReference.FaceAPIZone");
+        }
+
+        public static PersonGroup Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new PersonGroup();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public async Task<bool> CreateAsync(string personGroupId, string name, string userData)
+        {
+            dynamic body = new JObject();
+            body.name = name;
+            body.userData = userData;
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.PutAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}", queryString);
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+                return result;
+            }
+        }
+
+        public async Task<bool> DeleteAsync(string personGroupId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.DeleteAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}");
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+                return result;
+            }
+        }
+
+        public async Task<DomainPersonGroup.GetResult> GetAsync(string personGroupId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.GetAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}");
+
+                DomainPersonGroup.GetResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainPersonGroup.GetResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<DomainPersonGroup.GetTrainingStatusResult> GetTrainingStatusAsync(string personGroupId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.GetAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/training");
+
+                DomainPersonGroup.GetTrainingStatusResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainPersonGroup.GetTrainingStatusResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<List<DomainPersonGroup.ListResult>> ListAsync(string start, int top)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.GetAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups?start={start}&top={top}");
+
+                List<DomainPersonGroup.ListResult> result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<List<DomainPersonGroup.ListResult>>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<bool> TrainAsync(string personGroupId)
+        {
+            dynamic body = new JObject();
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.PostAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/train", queryString);
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<bool> UpdateAsync(string personGroupId, string name, string userData)
+        {
+            dynamic body = new JObject();
+            body.name = name;
+            body.userData = userData;
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.PatchAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}", queryString);
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+    }
+
+    public class PersonGroupPerson : IPersonGroupPerson
+    {
+        private static PersonGroupPerson instance = null;
+        private static readonly object padlock = new object();
+
+        PersonGroupPerson()
+        {
+            if (string.IsNullOrEmpty(APIReference.FaceAPIKey))
+                throw new Exception("FaceAPIKey required by: APIReference.FaceAPIKey");
+
+            if (string.IsNullOrEmpty(APIReference.FaceAPIZone))
+                throw new Exception("FaceAPIZone required by: APIReference.FaceAPIZone");
+        }
+
+        public static PersonGroupPerson Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new PersonGroupPerson();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public async Task<DomainPersonGroupPerson.AddFaceResult> AddFaceAsync(string personGroupId, string personId, string url, string userData, string targetFace)
+        {
+            dynamic body = new JObject();
+            body.url = url;
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.PostAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons/{personId}/persistedfaces?userData={userData}&targetFace={targetFace}", queryString);
+
+                DomainPersonGroupPerson.AddFaceResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainPersonGroupPerson.AddFaceResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<DomainPersonGroupPerson.CreateResult> CreateAsync(string personGroupId, string name, string userData)
+        {
+            dynamic body = new JObject();
+            body.name = name;
+            body.userData = userData;
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.PostAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons", queryString);
+
+                DomainPersonGroupPerson.CreateResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainPersonGroupPerson.CreateResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+                return result;
+            }
+        }
+
+        public async Task<bool> DeleteAsync(string personGroupId, string personId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.DeleteAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons/{personId}");
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+                return result;
+            }
+        }
+
+        public async Task<bool> DeleteFaceAsync(string personGroupId, string personId, string persistedFaceId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.DeleteAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons/{personId}/persistedfaces/{persistedFaceId}");
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<DomainPersonGroupPerson.GetResult> GetAsync(string personGroupId, string personId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.GetAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons/{personId}");
+
+                DomainPersonGroupPerson.GetResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainPersonGroupPerson.GetResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<DomainPersonGroupPerson.GetFaceResult> GetFaceAsync(string personGroupId, string personId, string persistedFaceId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.GetAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons/{personId}/persistedfaces/{persistedFaceId}");
+
+                DomainPersonGroupPerson.GetFaceResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainPersonGroupPerson.GetFaceResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<List<DomainPersonGroupPerson.ListResult>> ListAsync(string personGroupId, string start, int top)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.GetAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons?start={start}&top={top}");
+
+                List<DomainPersonGroupPerson.ListResult> result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<List<DomainPersonGroupPerson.ListResult>>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<bool> UpdateAsync(string personGroupId, string personId, string name, string userData)
+        {
+            dynamic body = new JObject();
+            body.name = name;
+            body.userData = userData;
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.PatchAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons/{personId}", queryString);
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new Exception($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<bool> UpdateFaceAsync(string personGroupId, string personId, string persistedFaceId, string userData)
+        {
+            dynamic body = new JObject();
+            body.userData = userData;
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", APIReference.FaceAPIKey);
+                var response = await client.PatchAsync($"https://{APIReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons/{personId}/persistedfaces/{persistedFaceId}", queryString);
 
                 bool result = false;
                 if (response.IsSuccessStatusCode)
