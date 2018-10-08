@@ -8,7 +8,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>https://github.com/Microsoft/cognitive-face-dotnet/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/microsoft/cognitive-face-dotnet</projectUrl>
-    <iconUrl>https://avatars0.githubusercontent.com/u/8558639?s=60&amp;v=4</iconUrl>
+    <iconUrl>https://robohash.org/Microsoft/cognitive-face-dotnet</iconUrl>
     <description>The Face API SDK enables software developers to easily and quickly access Microsft Cognitive Services Face Service.</description>
     <summary>All libraries developen in .Net Core.</summary>
     <releaseNotes>Initial release of the face Client SDK</releaseNotes>
