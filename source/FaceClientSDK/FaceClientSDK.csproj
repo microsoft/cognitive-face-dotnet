@@ -2,6 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Company>Microsoft</Company>
+    <Authors>Roberto Cervantes, Ignacio Quijas</Authors>
+    <Owners>Roberto Cervantes, Ignacio Quijas</Owners>
+    <PackageLicenseUrl>https://github.com/Microsoft/cognitive-face-dotnet/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/microsoft/cognitive-face-dotnet</PackageProjectUrl>
+    <PackageIconUrl></PackageIconUrl>
+    <Description>The Face API SDK enables software developers to easily and quickly access Microsoft Cognitive Services for face recognition.</Description>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageTags>azure, face, face api, cognitive services, dotnet, netcore, sdk</PackageTags>
+    <Copyright>Microsoft</Copyright>
+    <PackageId>Cognitive.Face.Dotnet</PackageId>
+    <Product>Cognitive.Face.Dotnet</Product>
+    <Summary>All libraries developen in .Net Core!.</Summary>
   </PropertyGroup>
 
   <ItemGroup>
