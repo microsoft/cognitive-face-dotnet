@@ -10,7 +10,7 @@
     <PackageLicenseUrl>https://github.com/Microsoft/cognitive-face-dotnet/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/microsoft/cognitive-face-dotnet</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
-    <Description>The Face API SDK enables software developers to easily and quickly access Microsoft Cognitive Services for face recognition.</Description>
+    <Description>The .NET Core Face API SDK enables software developers to easily and quickly access Microsoft Cognitive Services for face recognition.</Description>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageTags>azure, face, face api, cognitive services, dotnet, netcore, sdk</PackageTags>
     <Copyright>Microsoft</Copyright>
