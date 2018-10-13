@@ -18,7 +18,7 @@ namespace FaceClientSDK.Interfaces
 
         Task<GetFaceResult> GetFaceAsync(string largePersonGroupId, string personId, string persistedFaceId);
 
-        Task<List<ListResult>> ListAsync(string largePersonGroupId, string start, int top);
+        Task<List<ListResult>> ListAsync(string largePersonGroupId, string start, string top);
 
         Task<bool> UpdateAsync(string largePersonGroupId, string personId, string name, string userData);
 
