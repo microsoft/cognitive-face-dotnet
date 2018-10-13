@@ -250,7 +250,7 @@ namespace FaceClientSDK.Tests
                 var creation_result = await APIReference.Instance.LargeFaceList.CreateAsync(identifier, identifier, identifier);
 
                 if (creation_result)
-                    result = await APIReference.Instance.LargeFaceList.ListAsync(string.Empty, 1000);
+                    result = await APIReference.Instance.LargeFaceList.ListAsync(string.Empty, "1000");
             }
             catch
             {
