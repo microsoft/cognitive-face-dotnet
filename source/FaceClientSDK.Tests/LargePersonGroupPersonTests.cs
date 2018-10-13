@@ -230,7 +230,7 @@ namespace FaceClientSDK.Tests
                 personId = creation_person_result.personId;
 
                 if (creation_group_result)
-                    result = await APIReference.Instance.LargePersonGroupPerson.ListAsync(identifier, string.Empty, 1000);
+                    result = await APIReference.Instance.LargePersonGroupPerson.ListAsync(identifier, string.Empty, "1000");
             }
             catch
             {
