@@ -603,7 +603,7 @@ namespace FaceClientSDK
             }
         }
 
-        public async Task<List<DomainLargeFaceList.ListResult>> ListAsync(string start, int top)
+        public async Task<List<DomainLargeFaceList.ListResult>> ListAsync(string start, string top)
         {
             using (var client = new HttpClient())
             {
@@ -859,7 +859,7 @@ namespace FaceClientSDK
             }
         }
 
-        public async Task<List<DomainLargePersonGroup.ListResult>> ListAsync(string start, int top)
+        public async Task<List<DomainLargePersonGroup.ListResult>> ListAsync(string start, string top)
         {
             using (var client = new HttpClient())
             {
@@ -1116,7 +1116,7 @@ namespace FaceClientSDK
             }
         }
 
-        public async Task<List<DomainLargePersonGroupPerson.ListResult>> ListAsync(string largePersonGroupId, string start, int top)
+        public async Task<List<DomainLargePersonGroupPerson.ListResult>> ListAsync(string largePersonGroupId, string start, string top)
         {
             using (var client = new HttpClient())
             {
@@ -1322,7 +1322,7 @@ namespace FaceClientSDK
             }
         }
 
-        public async Task<List<DomainPersonGroup.ListResult>> ListAsync(string start, int top)
+        public async Task<List<DomainPersonGroup.ListResult>> ListAsync(string start, string top)
         {
             using (var client = new HttpClient())
             {
@@ -1579,7 +1579,7 @@ namespace FaceClientSDK
             }
         }
 
-        public async Task<List<DomainPersonGroupPerson.ListResult>> ListAsync(string personGroupId, string start, int top)
+        public async Task<List<DomainPersonGroupPerson.ListResult>> ListAsync(string personGroupId, string start, string top)
         {
             using (var client = new HttpClient())
             {

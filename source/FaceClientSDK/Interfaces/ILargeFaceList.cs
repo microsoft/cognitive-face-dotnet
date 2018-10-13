@@ -20,7 +20,7 @@ namespace FaceClientSDK.Interfaces
 
         Task<GetTrainingStatusResult> GetTrainingStatusAsync(string largeFaceListId);
 
-        Task<List<ListResult>> ListAsync(string start, int top);
+        Task<List<ListResult>> ListAsync(string start, string top);
 
         Task<List<ListFaceResult>> ListFaceAsync(string largeFaceListId);
 
