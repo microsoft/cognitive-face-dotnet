@@ -15,8 +15,8 @@ namespace FaceClientSDK.Tests
         {
             faceAPISettingsFixture = fixture;
 
-            APIReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
-            APIReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
+            ApiReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
+            ApiReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
         }
 
         [Fact]
@@ -27,7 +27,7 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+                var creation_result = await ApiReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
                 if (creation_result)
                 {
@@ -35,7 +35,7 @@ namespace FaceClientSDK.Tests
                     jUserData.UserDataSample = "User Data Sample";
                     var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    result = await APIReference.Instance.FaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                    result = await ApiReference.Instance.FaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
                 }
             }
             catch
@@ -44,7 +44,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.FaceList.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -58,7 +58,7 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+                result = await ApiReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
             }
             catch
             {
@@ -66,7 +66,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.FaceList.DeleteAsync(identifier);
             }
 
             Assert.True(result);
@@ -80,8 +80,8 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
-                result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+                var creation_result = await ApiReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+                result = await ApiReference.Instance.FaceList.DeleteAsync(identifier);
             }
             catch
             {
@@ -99,7 +99,7 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+                var creation_result = await ApiReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
                 AddFaceResult addface_result = null;
                 if (creation_result)
@@ -108,10 +108,10 @@ namespace FaceClientSDK.Tests
                     jUserData.UserDataSample = "User Data Sample";
                     var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    addface_result = await APIReference.Instance.FaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                    addface_result = await ApiReference.Instance.FaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
 
                     if (addface_result != null)
-                        result = await APIReference.Instance.FaceList.DeleteFaceAsync(identifier, addface_result.persistedFaceId);
+                        result = await ApiReference.Instance.FaceList.DeleteFaceAsync(identifier, addface_result.persistedFaceId);
                 }
             }
             catch
@@ -120,7 +120,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.FaceList.DeleteAsync(identifier);
             }
 
             Assert.True(result);
@@ -134,10 +134,10 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+                var creation_result = await ApiReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
                 if (creation_result)
-                    result = await APIReference.Instance.FaceList.GetAsync(identifier);
+                    result = await ApiReference.Instance.FaceList.GetAsync(identifier);
             }
             catch
             {
@@ -145,7 +145,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.FaceList.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -159,10 +159,10 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+                var creation_result = await ApiReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
                 if (creation_result)
-                    result = await APIReference.Instance.FaceList.ListAsync();
+                    result = await ApiReference.Instance.FaceList.ListAsync();
             }
             catch
             {
@@ -170,7 +170,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.FaceList.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -184,10 +184,10 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+                var creation_result = await ApiReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
 
                 if (creation_result)
-                    result = await APIReference.Instance.FaceList.UpdateAsync(identifier, "Name", "User Data Sample");
+                    result = await ApiReference.Instance.FaceList.UpdateAsync(identifier, "Name", "User Data Sample");
             }
             catch
             {
@@ -195,7 +195,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.FaceList.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.FaceList.DeleteAsync(identifier);
             }
 
             Assert.True(result);

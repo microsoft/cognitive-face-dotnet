@@ -15,8 +15,8 @@ namespace FaceClientSDK.Tests
         {
             faceAPISettingsFixture = fixture;
 
-            APIReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
-            APIReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
+            ApiReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
+            ApiReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
         }
 
         [Fact]
@@ -28,9 +28,9 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_group_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
+                var creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
                 if (creation_group_result)
@@ -39,7 +39,7 @@ namespace FaceClientSDK.Tests
                     jUserData.UserDataSample = "User Data Sample";
                     var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    result = await APIReference.Instance.LargePersonGroupPerson.AddFaceAsync(identifier, creation_person_result.personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                    result = await ApiReference.Instance.LargePersonGroupPerson.AddFaceAsync(identifier, creation_person_result.personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
                 }
             }
             catch
@@ -48,8 +48,8 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_person_result = await APIReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
-                var deletion_group_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+                var deletion_person_result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
+                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -63,10 +63,10 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_group_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
                 if (creation_group_result)
-                    result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
+                    result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
             }
             catch
             {
@@ -74,8 +74,8 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_person_result = await APIReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, result.personId);
-                var deletion_group_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+                var deletion_person_result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, result.personId);
+                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -89,13 +89,13 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_group_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
+                var creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
 
-                result = await APIReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, creation_person_result.personId);
+                result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, creation_person_result.personId);
 
-                var deletion_group_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
             }
             catch
             {
@@ -114,9 +114,9 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_group_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
+                var creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
                 AddFaceResult addface_result = null;
@@ -126,10 +126,10 @@ namespace FaceClientSDK.Tests
                     jUserData.UserDataSample = "User Data Sample";
                     var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    addface_result = await APIReference.Instance.LargePersonGroupPerson.AddFaceAsync(identifier, personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                    addface_result = await ApiReference.Instance.LargePersonGroupPerson.AddFaceAsync(identifier, personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
 
                     if (addface_result != null)
-                        result = await APIReference.Instance.LargePersonGroupPerson.DeleteFaceAsync(identifier, personId, addface_result.persistedFaceId);
+                        result = await ApiReference.Instance.LargePersonGroupPerson.DeleteFaceAsync(identifier, personId, addface_result.persistedFaceId);
                 }
             }
             catch
@@ -138,8 +138,8 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_person_result = await APIReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
-                var deletion_group_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+                var deletion_person_result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
+                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result);
@@ -154,13 +154,13 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_group_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
+                var creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
                 if (creation_group_result)
-                    result = await APIReference.Instance.LargePersonGroupPerson.GetAsync(identifier, personId);
+                    result = await ApiReference.Instance.LargePersonGroupPerson.GetAsync(identifier, personId);
             }
             catch
             {
@@ -168,8 +168,8 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_person_result = await APIReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
-                var deletion_group_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+                var deletion_person_result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
+                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -184,9 +184,9 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_group_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
+                var creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
                 AddFaceResult addface_result = null;
@@ -196,10 +196,10 @@ namespace FaceClientSDK.Tests
                     jUserData.UserDataSample = "User Data Sample";
                     var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    addface_result = await APIReference.Instance.LargePersonGroupPerson.AddFaceAsync(identifier, personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                    addface_result = await ApiReference.Instance.LargePersonGroupPerson.AddFaceAsync(identifier, personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
 
                     if (addface_result != null)
-                        result = await APIReference.Instance.LargePersonGroupPerson.GetFaceAsync(identifier, personId, addface_result.persistedFaceId);
+                        result = await ApiReference.Instance.LargePersonGroupPerson.GetFaceAsync(identifier, personId, addface_result.persistedFaceId);
                 }
             }
             catch
@@ -208,8 +208,8 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_person_result = await APIReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
-                var deletion_group_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+                var deletion_person_result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
+                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -224,13 +224,13 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_group_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
+                var creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
                 if (creation_group_result)
-                    result = await APIReference.Instance.LargePersonGroupPerson.ListAsync(identifier, string.Empty, "1000");
+                    result = await ApiReference.Instance.LargePersonGroupPerson.ListAsync(identifier, string.Empty, "1000");
             }
             catch
             {
@@ -238,8 +238,8 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_person_result = await APIReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
-                var deletion_group_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+                var deletion_person_result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
+                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -254,13 +254,13 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_group_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
+                var creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
                 if (creation_group_result)
-                    result = await APIReference.Instance.LargePersonGroupPerson.UpdateAsync(identifier, personId, "Name", "User Data Sample");
+                    result = await ApiReference.Instance.LargePersonGroupPerson.UpdateAsync(identifier, personId, "Name", "User Data Sample");
             }
             catch
             {
@@ -268,8 +268,8 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_person_result = await APIReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
-                var deletion_group_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+                var deletion_person_result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
+                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result);
@@ -284,9 +284,9 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_group_result = await APIReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
 
-                var creation_person_result = await APIReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
+                var creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
                 personId = creation_person_result.personId;
 
                 AddFaceResult addface_result = null;
@@ -296,10 +296,10 @@ namespace FaceClientSDK.Tests
                     jUserData.UserDataSample = "User Data Sample";
                     var rUserData = JsonConvert.SerializeObject(jUserData);
 
-                    addface_result = await APIReference.Instance.LargePersonGroupPerson.AddFaceAsync(identifier, personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                    addface_result = await ApiReference.Instance.LargePersonGroupPerson.AddFaceAsync(identifier, personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
 
                     if (addface_result != null)
-                        result = await APIReference.Instance.LargePersonGroupPerson.UpdateFaceAsync(identifier, personId, addface_result.persistedFaceId, "User Data Sample");
+                        result = await ApiReference.Instance.LargePersonGroupPerson.UpdateFaceAsync(identifier, personId, addface_result.persistedFaceId, "User Data Sample");
                 }
             }
             catch
@@ -308,8 +308,8 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_person_result = await APIReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
-                var deletion_group_result = await APIReference.Instance.LargePersonGroup.DeleteAsync(identifier);
+                var deletion_person_result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
+                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result);
