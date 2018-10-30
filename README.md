@@ -1,10 +1,10 @@
 
 ## Latest Builds
 
-Channel  | Core SDK 
+Channel  | CI Process 
 -------- | :------------: 
-development | [![Build status](https://technical-poets.visualstudio.com/cognitive-face-dotnet/_apis/build/status/cognitive-face-dotnet-development-CI)](https://technical-poets.visualstudio.com/cognitive-face-dotnet/_build/latest?definitionId=22)
-master | [![Build status](https://technical-poets.visualstudio.com/cognitive-face-dotnet/_apis/build/status/cognitive-face-dotnet-master-CI)](https://technical-poets.visualstudio.com/cognitive-face-dotnet/_build/latest?definitionId=23)
+development | <img src="https://technical-poets.visualstudio.com/cognitive-face-dotnet/_apis/build/status/cognitive-face-dotnet-development-CI" />
+master | <img src="https://technical-poets.visualstudio.com/cognitive-face-dotnet/_apis/build/status/cognitive-face-dotnet-master-CI" />
 
 # Contributing
 
