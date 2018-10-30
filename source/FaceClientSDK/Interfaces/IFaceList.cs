@@ -6,18 +6,18 @@ namespace FaceClientSDK.Interfaces
 {
     public interface IFaceList
     {
-        Task<AddFaceResult> AddFaceAsync(string largeFaceListId, string url, string userData, string targetFace);
+        Task<AddFaceResult> AddFaceAsync(string faceListId, string url, string userData, string targetFace);
 
-        Task<bool> CreateAsync(string largeFaceListId, string name, string userData);
+        Task<bool> CreateAsync(string faceListId, string name, string userData);
 
-        Task<bool> DeleteAsync(string largeFaceListId);
+        Task<bool> DeleteAsync(string faceListId);
 
-        Task<bool> DeleteFaceAsync(string largeFaceListId, string persistedFaceId);
+        Task<bool> DeleteFaceAsync(string faceListId, string persistedFaceId);
 
-        Task<GetResult> GetAsync(string largeFaceListId);
+        Task<GetResult> GetAsync(string faceListId);
 
         Task<List<ListResult>> ListAsync();
 
-        Task<bool> UpdateAsync(string largeFaceListId, string name, string userData);
+        Task<bool> UpdateAsync(string faceListId, string name, string userData);
     }
 }

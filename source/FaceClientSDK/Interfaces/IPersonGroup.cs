@@ -6,18 +6,18 @@ namespace FaceClientSDK.Interfaces
 {
     public interface IPersonGroup
     {
-        Task<bool> CreateAsync(string largePersonGroupId, string name, string userData);
+        Task<bool> CreateAsync(string personGroupId, string name, string userData);
 
-        Task<bool> DeleteAsync(string largePersonGroupId);
+        Task<bool> DeleteAsync(string personGroupId);
 
-        Task<GetResult> GetAsync(string largePersonGroupId);
+        Task<GetResult> GetAsync(string personGroupId);
 
-        Task<GetTrainingStatusResult> GetTrainingStatusAsync(string largePersonGroupId);
+        Task<GetTrainingStatusResult> GetTrainingStatusAsync(string personGroupId);
 
         Task<List<ListResult>> ListAsync(string start, string top);
 
-        Task<bool> TrainAsync(string largePersonGroupId);
+        Task<bool> TrainAsync(string personGroupId);
 
-        Task<bool> UpdateAsync(string largePersonGroupId, string name, string userData);
+        Task<bool> UpdateAsync(string personGroupId, string name, string userData);
     }
 }

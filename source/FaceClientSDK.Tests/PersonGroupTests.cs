@@ -13,8 +13,8 @@ namespace FaceClientSDK.Tests
         {
             faceAPISettingsFixture = fixture;
 
-            APIReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
-            APIReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
+            ApiReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
+            ApiReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
         }
 
         [Fact]
@@ -25,7 +25,7 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                result = await APIReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
             }
             catch
             {
@@ -33,7 +33,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.PersonGroup.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result);
@@ -47,8 +47,8 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
-                result = await APIReference.Instance.PersonGroup.DeleteAsync(identifier);
+                var creation_result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
             }
             catch
             {
@@ -66,10 +66,10 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
 
                 if (creation_result)
-                    result = await APIReference.Instance.PersonGroup.GetAsync(identifier);
+                    result = await ApiReference.Instance.PersonGroup.GetAsync(identifier);
             }
             catch
             {
@@ -77,7 +77,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.PersonGroup.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -91,17 +91,17 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
 
                 bool training_result = false;
-                training_result = await APIReference.Instance.PersonGroup.TrainAsync(identifier);
+                training_result = await ApiReference.Instance.PersonGroup.TrainAsync(identifier);
 
                 if (training_result)
                 {
                     while (true)
                     {
                         System.Threading.Tasks.Task.Delay(1000).Wait();
-                        result = await APIReference.Instance.PersonGroup.GetTrainingStatusAsync(identifier);
+                        result = await ApiReference.Instance.PersonGroup.GetTrainingStatusAsync(identifier);
 
                         if (result.status != "running")
                         {
@@ -116,7 +116,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.PersonGroup.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -130,10 +130,10 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
 
                 if (creation_result)
-                    result = await APIReference.Instance.PersonGroup.ListAsync(string.Empty, "1000");
+                    result = await ApiReference.Instance.PersonGroup.ListAsync(string.Empty, "1000");
             }
             catch
             {
@@ -141,7 +141,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.PersonGroup.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result != null);
@@ -155,13 +155,13 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
-                result = await APIReference.Instance.PersonGroup.TrainAsync(identifier);
+                var creation_result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                result = await ApiReference.Instance.PersonGroup.TrainAsync(identifier);
 
                 while (true)
                 {
                     System.Threading.Tasks.Task.Delay(1000).Wait();
-                    var status = await APIReference.Instance.PersonGroup.GetTrainingStatusAsync(identifier);
+                    var status = await ApiReference.Instance.PersonGroup.GetTrainingStatusAsync(identifier);
 
                     if (status.status != "running")
                     {
@@ -175,7 +175,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.PersonGroup.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result);
@@ -189,10 +189,10 @@ namespace FaceClientSDK.Tests
 
             try
             {
-                var creation_result = await APIReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                var creation_result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
 
                 if (creation_result)
-                    result = await APIReference.Instance.PersonGroup.UpdateAsync(identifier, "Name", "User Data Sample");
+                    result = await ApiReference.Instance.PersonGroup.UpdateAsync(identifier, "Name", "User Data Sample");
             }
             catch
             {
@@ -200,7 +200,7 @@ namespace FaceClientSDK.Tests
             }
             finally
             {
-                var deletion_result = await APIReference.Instance.PersonGroup.DeleteAsync(identifier);
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
             }
 
             Assert.True(result);
