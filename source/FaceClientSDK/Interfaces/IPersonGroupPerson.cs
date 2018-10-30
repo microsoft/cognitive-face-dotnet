@@ -6,22 +6,22 @@ namespace FaceClientSDK.Interfaces
 {
     public interface IPersonGroupPerson
     {
-        Task<AddFaceResult> AddFaceAsync(string largePersonGroupId, string personId, string url, string userData, string targetFace);
+        Task<AddFaceResult> AddFaceAsync(string personGroupId, string personId, string url, string userData, string targetFace);
 
-        Task<CreateResult> CreateAsync(string largePersonGroupId, string name, string userData);
+        Task<CreateResult> CreateAsync(string personGroupId, string name, string userData);
 
-        Task<bool> DeleteAsync(string largePersonGroupId, string personId);
+        Task<bool> DeleteAsync(string personGroupId, string personId);
 
-        Task<bool> DeleteFaceAsync(string largePersonGroupId, string personId, string persistedFaceId);
+        Task<bool> DeleteFaceAsync(string personGroupId, string personId, string persistedFaceId);
 
-        Task<GetResult> GetAsync(string largePersonGroupId, string personId);
+        Task<GetResult> GetAsync(string personGroupId, string personId);
 
-        Task<GetFaceResult> GetFaceAsync(string largePersonGroupId, string personId, string persistedFaceId);
+        Task<GetFaceResult> GetFaceAsync(string personGroupId, string personId, string persistedFaceId);
 
-        Task<List<ListResult>> ListAsync(string largePersonGroupId, string start, string top);
+        Task<List<ListResult>> ListAsync(string personGroupId, string start, string top);
 
-        Task<bool> UpdateAsync(string largePersonGroupId, string personId, string name, string userData);
+        Task<bool> UpdateAsync(string personGroupId, string personId, string name, string userData);
 
-        Task<bool> UpdateFaceAsync(string largePersonGroupId, string personId, string persistedFaceId, string userData);
+        Task<bool> UpdateFaceAsync(string personGroupId, string personId, string persistedFaceId, string userData);
     }
 }
