@@ -194,6 +194,74 @@ namespace FaceClientSDK
             }
         }
 
+        public async Task<DomainFace.GroupResult> GroupAsync(string[] faceIds)
+        {
+            dynamic body = new JObject();
+
+            if (faceIds.Length > 0)
+                body.faceIds = JArray.FromObject(faceIds);
+
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
+                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/group", queryString);
+
+                DomainFace.GroupResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainFace.GroupResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+
+        }
+
+        public async Task<DomainFace.IdentifyResult> IdentifyAsync(string largePersonGroupId, string[] faceIds, int maxNumOfCandidatesReturned, double confidenceThreshold)
+        {
+            dynamic body = new JObject();
+
+            if (largePersonGroupId != string.Empty)
+                body.largePersonGroupId = largePersonGroupId;
+
+            if (faceIds.Length > 0)
+                body.faceIds = JArray.FromObject(faceIds);
+
+            body.maxNumOfCandidatesReturned = maxNumOfCandidatesReturned;
+            body.confidenceThreshold = confidenceThreshold;
+
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
+                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/identify", queryString);
+
+                DomainFace.IdentifyResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainFace.IdentifyResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
     }
 
     public class FaceList : IFaceList
