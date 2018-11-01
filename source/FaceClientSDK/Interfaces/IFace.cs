@@ -10,6 +10,10 @@ namespace FaceClientSDK.Interfaces
 
         Task<List<FindSimilarResult>> FindSimilarAsync(string faceId, string faceListId, string largeFaceListId, string[] faceIds, int maxNumOfCandidatesReturned, string mode);
 
+        Task<GroupResult> GroupAsync(string[] faceIds);
+
         Task<VerifyResult> VerifyAsync(string faceId1, string faceId2, string faceId, string personGroupId, string largePersonGroupId, string personId);
+
+        Task<IdentifyResult> IdentifyAsync(string largePersonGroupId, string[] faceIds, int maxNumOfCandidatesReturned, double confidenceThreshold);
     }
 }
