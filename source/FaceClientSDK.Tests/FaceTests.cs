@@ -3,6 +3,7 @@ using FaceClientSDK.Tests.Fixtures;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 using DomainFaceList = FaceClientSDK.Domain.FaceList;
 using DomainLargePersonGroupPerson = FaceClientSDK.Domain.LargePersonGroupPerson;
@@ -79,6 +80,12 @@ namespace FaceClientSDK.Tests
         }
 
         [Fact]
+        public async void IdentifyAsyncTest()
+        {
+            throw new KeyNotFoundException();
+        }
+
+        [Fact]
         public async void VerifyAsyncTest()
         {
             VerifyResult result = null;
@@ -122,6 +129,30 @@ namespace FaceClientSDK.Tests
             }
 
             Assert.True(result != null);
+        }
+
+        [Fact]
+        public async void GroupyAsyncTest()
+        {
+            List<DetectResult> detectResult = null;
+            GroupResult groupResult = null;
+
+            try
+            {
+                detectResult = await ApiReference.Instance.Face.DetectAsync(faceAPISettingsFixture.TestGroupImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
+                if (detectResult.Count>0)
+                {
+                    var faceIds = from result in detectResult select result.faceId;
+
+                    groupResult = await ApiReference.Instance.Face.GroupAsync(faceIds.ToArray());
+                }
+            }
+            catch
+            {
+                throw;
+            }
+
+            Assert.True(groupResult != null);
         }
     }
 }
