@@ -9,6 +9,7 @@ namespace FaceClientSDK.Tests.Fixtures
         public string FaceAPIKey { get; set; }
         public string FaceAPIZone { get; set; }
         public string TestImageUrl { get; set; }
+        public string TestGroupImageUrl { get; set; }
 
         public FaceAPISettingsFixture()
         {
@@ -20,6 +21,7 @@ namespace FaceClientSDK.Tests.Fixtures
             FaceAPIKey = config.GetSection("general:FaceAPIKey").Value;
             FaceAPIZone = config.GetSection("general:FaceAPIZone").Value;
             TestImageUrl = config.GetSection("general:TestImageUrl").Value;
+            TestGroupImageUrl = config.GetSection("general:TestGroupImageUrl").Value;
         }
 
         public void Dispose()
