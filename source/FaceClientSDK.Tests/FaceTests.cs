@@ -80,12 +80,6 @@ namespace FaceClientSDK.Tests
         }
 
         [Fact]
-        public async void IdentifyAsyncTest()
-        {
-            throw new KeyNotFoundException();
-        }
-
-        [Fact]
         public async void VerifyAsyncTest()
         {
             VerifyResult result = null;
