@@ -136,9 +136,7 @@ namespace FaceClientSDK.Tests
                 detectResult = await ApiReference.Instance.Face.DetectAsync(faceAPISettingsFixture.TestGroupImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
                 if (detectResult.Count>0)
                 {
-                    var faceIds = from result in detectResult select result.faceId;
-
-                    groupResult = await ApiReference.Instance.Face.GroupAsync(faceIds.ToArray());
+                    groupResult = await ApiReference.Instance.Face.GroupAsync((from result in detectResult select result.faceId).ToArray());
                 }
             }
             catch
