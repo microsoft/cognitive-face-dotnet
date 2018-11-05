@@ -126,7 +126,7 @@ namespace FaceClientSDK.Tests
         }
 
         [Fact]
-        public async void GroupyAsyncTest()
+        public async void GroupAsyncTest()
         {
             List<DetectResult> detectResult = null;
             GroupResult groupResult = null;
