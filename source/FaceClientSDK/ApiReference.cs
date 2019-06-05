@@ -7,6 +7,7 @@ using DomainLargePersonGroup = FaceClientSDK.Domain.LargePersonGroup;
 using DomainLargePersonGroupPerson = FaceClientSDK.Domain.LargePersonGroupPerson;
 using DomainPersonGroup = FaceClientSDK.Domain.PersonGroup;
 using DomainPersonGroupPerson = FaceClientSDK.Domain.PersonGroupPerson;
+using DomainSnapshot = FaceClientSDK.Domain.Snapshot;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -30,6 +31,7 @@ namespace FaceClientSDK
         public LargePersonGroupPerson LargePersonGroupPerson { get; set; } = LargePersonGroupPerson.Instance;
         public PersonGroup PersonGroup { get; set; } = PersonGroup.Instance;
         public PersonGroupPerson PersonGroupPerson { get; set; } = PersonGroupPerson.Instance;
+        public Snapshot Snapshot { get; set; } = Snapshot.Instance;
 
         ApiReference()
         {
@@ -1709,6 +1711,215 @@ namespace FaceClientSDK
             {
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
                 var response = await client.PatchAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons/{personId}/persistedfaces/{persistedFaceId}", queryString);
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+    }
+
+    public class Snapshot: ISnapshot
+    {
+        private static Snapshot instance = null;
+        private static readonly object padlock = new object();
+
+        Snapshot()
+        {
+            if (string.IsNullOrEmpty(ApiReference.FaceAPIKey))
+                throw new ArgumentException(message: "FaceAPIKey required by: ApiReference.FaceAPIKey");
+
+            if (string.IsNullOrEmpty(ApiReference.FaceAPIZone))
+                throw new ArgumentException(message: "FaceAPIZone required by: ApiReference.FaceAPIZone");
+        }
+
+        public static Snapshot Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new Snapshot();
+                    }
+                    return instance;
+                }
+            }
+        }
+    
+        public async Task<bool> ApplyAsync(string snapshotId, string objectId, string mode)
+        {
+            dynamic body = new JObject();
+            body.objectId = objectId;
+            body.mode = mode;
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
+                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots/{snapshotId}/apply", queryString);
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
+                }
+                return result;
+            }
+        }
+       
+        public async Task<bool> DeleteAsync(string snapshotId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
+                var response = await client.DeleteAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots/{snapshotId}");
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
+                }
+                return result;
+            }
+        }
+        
+        public async Task<DomainSnapshot.GetResult> GetAsync(string snapshotId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
+                var response = await client.GetAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots/{snapshotId}");
+
+                DomainSnapshot.GetResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainSnapshot.GetResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+        
+        public async Task<DomainSnapshot.GetOperationStatusResult> GetOperationStatusAsync(string snapshotId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
+                var response = await client.GetAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/operations/{snapshotId}");
+
+                DomainSnapshot.GetOperationStatusResult result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<DomainSnapshot.GetOperationStatusResult>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<List<DomainSnapshot.ListResult>> ListAsync(string type, string applyScope)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);               
+                var response = await client.GetAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots[?{type}][&{applyScope}]");
+           
+                List <DomainSnapshot.ListResult> result = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<List<DomainSnapshot.ListResult>>(json);
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<bool> TakeAsync(string type, string objectId, string[] applyScope, string userData)
+        {
+            dynamic body = new JObject();
+            body.type = type;
+            body.objectId = objectId;
+            body.applyScope = applyScope;
+            body.userData = userData;
+
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
+                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}/face/v1.0/snapshots", queryString);
+
+                bool result = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    result = true;
+                }
+                else
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
+                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
+                }
+                return result;
+            }
+        }
+
+        public async Task<bool> UpdateAsync(string snapshotId, string[] applyScope, string userData)
+        {
+            dynamic body = new JObject();
+            body.applyScope = applyScope;
+            body.userData = userData;
+            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
+                var response = await client.PatchAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots/{snapshotId}", queryString);
 
                 bool result = false;
                 if (response.IsSuccessStatusCode)
