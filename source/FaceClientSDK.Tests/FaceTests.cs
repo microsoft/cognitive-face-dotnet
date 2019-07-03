@@ -134,7 +134,7 @@ namespace FaceClientSDK.Tests
             try
             {
                 detectResult = await ApiReference.Instance.Face.DetectAsync(faceAPISettingsFixture.TestGroupImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
-                if (detectResult.Count>0)
+                if (detectResult.Count > 0)
                 {
                     groupResult = await ApiReference.Instance.Face.GroupAsync((from result in detectResult select result.faceId).ToArray());
                 }
@@ -145,6 +145,25 @@ namespace FaceClientSDK.Tests
             }
 
             Assert.True(groupResult != null);
+        }
+
+        [Fact]
+        public async void IdentifyAsyncTest()
+        {
+            List<IdentifyResult> result = null;
+            var identifier = System.Guid.NewGuid().ToString();
+            string[] faceIds = new[] { "" };
+
+            try
+            {
+                result = await ApiReference.Instance.Face.IdentifyAsync(identifier, faceIds, 1, 0.5);
+            }
+            catch
+            {
+                throw;
+            }
+
+            Assert.True(result != null);
         }
     }
 }
