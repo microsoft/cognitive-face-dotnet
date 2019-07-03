@@ -226,7 +226,7 @@ namespace FaceClientSDK
 
         }
 
-        public async Task<DomainFace.IdentifyResult> IdentifyAsync(string largePersonGroupId, string[] faceIds, int maxNumOfCandidatesReturned, double confidenceThreshold)
+        public async Task<List<DomainFace.IdentifyResult>> IdentifyAsync(string largePersonGroupId, string[] faceIds, int maxNumOfCandidatesReturned, double confidenceThreshold)
         {
             dynamic body = new JObject();
 
@@ -246,11 +246,11 @@ namespace FaceClientSDK
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
                 var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/identify", queryString);
 
-                DomainFace.IdentifyResult result = null;
+                List<DomainFace.IdentifyResult> result = null;
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<DomainFace.IdentifyResult>(json);
+                    result = JsonConvert.DeserializeObject<List<DomainFace.IdentifyResult>>(json);
                 }
                 else
                 {
