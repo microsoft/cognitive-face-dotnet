@@ -16,8 +16,8 @@ namespace FaceClientSDK.Domain.Snapshot
 
         public string userData { get; set; }
 
-        public string createdDateTime { get; set; }
+        public DateTime createdDateTime { get; set; }
 
-        public string lastUpdatedDateTime { get; set; }
+        public DateTime lastUpdatedDateTime { get; set; }
     }
 }

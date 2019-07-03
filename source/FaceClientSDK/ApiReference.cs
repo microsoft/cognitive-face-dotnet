@@ -1859,9 +1859,9 @@ namespace FaceClientSDK
         {
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);               
-                var response = await client.GetAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots[?{type}][&{applyScope}]");
-           
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
+                var response = await client.GetAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots?type={type}&applyScope={applyScope}");
+
                 List <DomainSnapshot.ListResult> result = null;
                 if (response.IsSuccessStatusCode)
                 {
@@ -1882,17 +1882,18 @@ namespace FaceClientSDK
         public async Task<bool> TakeAsync(string type, string objectId, string[] applyScope, string userData)
         {
             dynamic body = new JObject();
+
             body.type = type;
             body.objectId = objectId;
-            body.applyScope = applyScope;
-            body.userData = userData;
-
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+            var jSonArray = JsonConvert.SerializeObject(applyScope);            
+            body.applyScope = JArray.Parse(jSonArray);
+            body.userData = userData;                     
+            StringContent queryString = new StringContent(JsonConvert.SerializeObject(body), System.Text.Encoding.UTF8, "application/json");
 
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}/face/v1.0/snapshots", queryString);
+                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots", queryString);
 
                 bool result = false;
                 if (response.IsSuccessStatusCode)
@@ -1912,9 +1913,10 @@ namespace FaceClientSDK
         public async Task<bool> UpdateAsync(string snapshotId, string[] applyScope, string userData)
         {
             dynamic body = new JObject();
-            body.applyScope = applyScope;
             body.userData = userData;
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
+            var jSonArray = JsonConvert.SerializeObject(applyScope);
+            body.applyScope = JArray.Parse(jSonArray);
+            StringContent queryString = new StringContent(JsonConvert.SerializeObject(body), System.Text.Encoding.UTF8, "application/json");
 
             using (var client = new HttpClient())
             {

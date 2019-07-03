@@ -6,7 +6,8 @@ namespace FaceClientSDK.Domain.Snapshot
 {
     public class ListResult
     {
-        public string snapshotId { get; set; }
+        
+        public string id { get; set; }
 
         public string account { get; set; }
 
@@ -16,8 +17,8 @@ namespace FaceClientSDK.Domain.Snapshot
 
         public string userData { get; set; }
 
-        public string createdDateTime { get; set; }
+        public DateTime createdDateTime { get; set; }
 
-        public string lastUpdatedDateTime { get; set; }
+        public DateTime lastUpdatedDateTime { get; set; }
     }
 }

@@ -7,6 +7,8 @@ using FaceClientSDK.Domain.Snapshot;
 using FaceClientSDK.Tests.Fixtures;
 using Xunit;
 using System.Linq;
+using ListResult = FaceClientSDK.Domain.Snapshot.ListResult;
+using GetResult = FaceClientSDK.Domain.Snapshot.GetResult;
 
 namespace FaceClientSDK.Tests
 {
@@ -25,47 +27,76 @@ namespace FaceClientSDK.Tests
 
             identifier = Guid.NewGuid().ToString();
             Guid[] guidArray = new Guid[3];
+            guidArray[0] = Guid.NewGuid();
+            guidArray[1] = Guid.NewGuid();
+            guidArray[2] = Guid.NewGuid();
+
             applyScope = Array.ConvertAll(guidArray, x => x.ToString());
         }       
 
         [Fact]
         public async void TakeAsync()
-        {            
-            var objectType = "FaceList";
-            var objectId = "source-face-list-id"; 
-            var snapshotUserData = "User provided data for the snapshot.";
-            
+        {
+            bool result = false;
             bool takeSnapshotResult = false;
+            List<ListResult> listResult = null;
+            var objectType = "PersonGroup";
+            
+            //Add PersonGroup to transfer
             try
             {
-                takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, objectId, applyScope, snapshotUserData);
+                result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
+                listResult = await ApiReference.Instance.Snapshot.ListAsync(objectType, applyScope.First());
 
             }
             catch (Exception)
             {
-
                 throw;
+            }          
+           finally
+            {
+                //Delete PersonGroup
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
+                //Delete Take
+                var delete_take = await ApiReference.Instance.Snapshot.DeleteAsync(listResult.First().id);
             }
 
             Assert.True(takeSnapshotResult);
         }
         [Fact]
         public async void ApplyAsync()
-        {                        
-            var objectId = "target-face-list-id";
+        {
+            bool resultPersonGroup = false;
+            var takeSnapshotResult = false;
+            var objectType = "PersonGroup";
+            List<ListResult> listResult = null;
             var mode = "CreateNew";
 
             bool applySnapshot_result = false;
 
             try
             {
-                applySnapshot_result = await ApiReference.Instance.Snapshot.ApplyAsync(identifier, objectId, mode);
+                var creation_result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                
+                resultPersonGroup = await ApiReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
+                takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
+                listResult = await ApiReference.Instance.Snapshot.ListAsync(objectType, applyScope.First());
+
+                applySnapshot_result = await ApiReference.Instance.Snapshot.ApplyAsync(listResult.First().id, identifier, mode);
                 
             }
             catch (Exception)
             {
 
                 throw;
+            }
+            finally
+            {
+                //Delete PersonGroup
+                var deletion_result = await ApiReference.Instance.FaceList.DeleteAsync(identifier);
+                //Delete Take
+                var delete_take = await ApiReference.Instance.Snapshot.DeleteAsync(listResult.First().id);
             }
 
             Assert.True(applySnapshot_result);
@@ -76,16 +107,27 @@ namespace FaceClientSDK.Tests
         public async void DeleteAsync()
         {
             bool result = false;
+            bool resultPersonGroup = false;
+            var takeSnapshotResult = false;
+            var objectType = "PersonGroup";
+            List<ListResult> listResult = null;
 
-            GetResult get_result = null;
             try
             {
-                get_result = await ApiReference.Instance.Snapshot.GetAsync(identifier);
-                result = await ApiReference.Instance.Snapshot.DeleteAsync(identifier);
+                resultPersonGroup = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
+                listResult = await ApiReference.Instance.Snapshot.ListAsync(objectType, applyScope.First());
+
+                result = await ApiReference.Instance.Snapshot.DeleteAsync(listResult.First().id);
             }
             catch
             {
                 throw;
+            }
+            finally
+            {
+                //Delete PersonGroup
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);                
             }
 
             Assert.True(result);
@@ -93,15 +135,31 @@ namespace FaceClientSDK.Tests
 
         [Fact]
         public async void GetAsync()
-        {          
+        {
+            bool resultPersonGroup = false;
             GetResult result = null;
+            var takeSnapshotResult = false;
+            var objectType = "PersonGroup";
+            List<ListResult> listResult = null;
+
+            //Add PersonGroup and Take Operation 
             try
             {
-                result = await ApiReference.Instance.Snapshot.GetAsync(identifier);
+                resultPersonGroup = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
+                listResult = await ApiReference.Instance.Snapshot.ListAsync(objectType, applyScope.First());
+                result = await ApiReference.Instance.Snapshot.GetAsync(listResult.First().id);
             }
             catch
             {
                 throw;
+            }
+            finally
+            {
+                //Delete PersonGroup
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
+                //Delete Take
+                var delete_take = await ApiReference.Instance.Snapshot.DeleteAsync(listResult.First().id);
             }
 
             Assert.True(result != null);
@@ -129,10 +187,10 @@ namespace FaceClientSDK.Tests
         public async void ListAsync()
         {
             List<ListResult> result = null;
-            var objectType = "FaceList";
+            var objectType = "PersonGroup";
             try
             {
-                result = await ApiReference.Instance.Snapshot.ListAsync(objectType,applyScope.ToString());
+                result = await ApiReference.Instance.Snapshot.ListAsync(objectType,String.Empty);
             }
             catch
             {
@@ -147,20 +205,33 @@ namespace FaceClientSDK.Tests
         public async void UpdateAsync()
         {
             bool result = false;
+            bool resultPersonGroup = false;
             string userData = string.Empty;
-            var updateApplyScope = applyScope.Skip(1).ToArray();
-        
+            var takeSnapshotResult = false;
+            var objectType = "PersonGroup";
+            List<ListResult> listResult = null;
             try
             {
-                result = await ApiReference.Instance.Snapshot.UpdateAsync(identifier, updateApplyScope, userData);
+                resultPersonGroup = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
+                takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
+                listResult = await ApiReference.Instance.Snapshot.ListAsync(objectType, applyScope.First());
+
+                result = await ApiReference.Instance.Snapshot.UpdateAsync(listResult.First().id, applyScope.Skip(1).ToArray(), userData);
             }
             catch
             {
                 throw;
             }
+            finally
+            {
+                //Delete PersonGroup
+                var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
+                //Delete Take
+                var delete_take = await ApiReference.Instance.Snapshot.DeleteAsync(listResult.First().id);
+            }
 
             Assert.True(result);
-        }
+        }       
 
     }
 }
