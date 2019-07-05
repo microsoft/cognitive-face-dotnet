@@ -16,7 +16,7 @@ namespace FaceClientSDK.Interfaces
 
         Task<List<ListResult>> ListAsync(string type, string applyScope);
 
-        Task<bool> TakeAsync(string type, string objectId, string[] applyScope, string userData);  
+        Task<TakeResult> TakeAsync(string type, string objectId, string[] applyScope, string userData);  
 
         Task<bool> UpdateAsync(string snapshotId, string [] applyScope, string userData);
 

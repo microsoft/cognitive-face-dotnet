@@ -4,8 +4,8 @@ using System.Text;
 
 namespace FaceClientSDK.Domain.Snapshot
 {
-    class TakeResult
+    public class TakeResult
     {
-        public string id { get; set; }
+        public string OperationLocation { get; set; }
     }
 }

@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FaceClientSDK
 {
@@ -1879,10 +1880,9 @@ namespace FaceClientSDK
             }
         }
 
-        public async Task<bool> TakeAsync(string type, string objectId, string[] applyScope, string userData)
+        public async Task<DomainSnapshot.TakeResult> TakeAsync(string type, string objectId, string[] applyScope, string userData)
         {
             dynamic body = new JObject();
-
             body.type = type;
             body.objectId = objectId;
             var jSonArray = JsonConvert.SerializeObject(applyScope);            
@@ -1895,10 +1895,10 @@ namespace FaceClientSDK
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
                 var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots", queryString);
 
-                bool result = false;
+                DomainSnapshot.TakeResult result = null;
                 if (response.IsSuccessStatusCode)
-                {
-                    result = true;
+                {                   
+                    result = new DomainSnapshot.TakeResult { OperationLocation = response.Headers.GetValues("Operation-Location").First().Split("/")[2] };
                 }
                 else
                 {
