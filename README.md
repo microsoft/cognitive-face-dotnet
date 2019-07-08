@@ -1,4 +1,6 @@
 
+## Cognitive Face Dotnet
+
 ## Latest Builds
 
 Channel  | CI Process 
@@ -6,7 +8,7 @@ Channel  | CI Process
 development | <img src="https://technical-poets.visualstudio.com/cognitive-face-dotnet/_apis/build/status/cognitive-face-dotnet-development-CI" />
 master | <img src="https://technical-poets.visualstudio.com/cognitive-face-dotnet/_apis/build/status/cognitive-face-dotnet-master-CI" />
 
-# Contributing
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
