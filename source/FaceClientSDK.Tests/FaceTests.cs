@@ -1,4 +1,5 @@
 using FaceClientSDK.Domain.Face;
+using FaceClientSDK.Domain.LargePersonGroupPerson;
 using FaceClientSDK.Tests.Fixtures;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -150,19 +151,54 @@ namespace FaceClientSDK.Tests
         [Fact]
         public async void IdentifyAsyncTest()
         {
-            List<IdentifyResult> result = null;
-            var identifier = System.Guid.NewGuid().ToString();
-            string[] faceIds = new[] { "" };
+            bool resultTrainLargePersonGroup = false;
+            AddFaceResult add_face_result = null;
+            CreateResult creation_person_result = null;
+            List<DetectResult> face_detect_result = null;
 
+            List<IdentifyResult> result = null;
+            var largePersonGroupId = System.Guid.NewGuid().ToString();
+            
             try
             {
-                result = await ApiReference.Instance.Face.IdentifyAsync(identifier, faceIds, 1, 0.5);
+
+                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(largePersonGroupId, "person-group-name", "recognition_02");
+
+                if (creation_group_result)
+                {
+                    creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(largePersonGroupId, "person-name", "User-provided data attached to the person.");
+
+                    dynamic jUserData = new JObject();
+                    jUserData.UserDataSample = "User Data Sample";
+                    var rUserData = JsonConvert.SerializeObject(jUserData);
+
+                    add_face_result = await ApiReference.Instance.LargePersonGroupPerson.AddFaceAsync(largePersonGroupId, creation_person_result.personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+
+
+                    resultTrainLargePersonGroup = await ApiReference.Instance.LargePersonGroup.TrainAsync(largePersonGroupId);
+
+                    while (true)
+                    {
+                        System.Threading.Tasks.Task.Delay(1000).Wait();
+                        var status = await ApiReference.Instance.LargePersonGroup.GetTrainingStatusAsync(largePersonGroupId);
+
+                        if (status.status != "running")
+                        {
+                            break;
+                        }
+                    }
+                    face_detect_result = await ApiReference.Instance.Face.DetectAsync(faceAPISettingsFixture.TestImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
+                    result = await ApiReference.Instance.Face.IdentifyAsync(largePersonGroupId, new[] { face_detect_result[0].faceId }, 1, 0);
+                }
             }
             catch
             {
                 throw;
             }
-
+            finally
+            {
+                var deletion_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(largePersonGroupId);
+            }
             Assert.True(result != null);
         }
     }
