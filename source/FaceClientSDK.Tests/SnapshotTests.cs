@@ -94,13 +94,13 @@ namespace FaceClientSDK.Tests
                 takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
                 while (true)
                 {
+                    Task.Delay(1000).Wait();
                     operationResult = await ApiReference.Instance.Snapshot.GetOperationStatusAsync(takeSnapshotResult.OperationLocation);
 
                     if (operationResult.status != "running")
                     {
                         break;
                     }
-                    Task.Delay(1000).Wait();
                 }
                 id = operationResult.resourceLocation.Split("/")[2];
                 applySnapshot_result = await ApiReference.Instance.Snapshot.ApplyAsync(id, "new" + identifier, mode);
@@ -135,13 +135,13 @@ namespace FaceClientSDK.Tests
                 takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
                 while (true)
                 {
+                    Task.Delay(1000).Wait();
                     operationResult = await ApiReference.Instance.Snapshot.GetOperationStatusAsync(takeSnapshotResult.OperationLocation);
 
                     if (operationResult.status != "running")
                     {
                         break;
                     }
-                    Task.Delay(1000).Wait();
                 }
                 id = operationResult.resourceLocation.Split("/")[2];
                 result = await ApiReference.Instance.Snapshot.DeleteAsync(id);
@@ -176,13 +176,13 @@ namespace FaceClientSDK.Tests
                 takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
                 while (true)
                 {
+                    Task.Delay(1000).Wait();
                     operationResult = await ApiReference.Instance.Snapshot.GetOperationStatusAsync(takeSnapshotResult.OperationLocation);
 
                     if (operationResult.status != "running")
                     {
                         break;
                     }
-                    Task.Delay(1000).Wait();
                 }
 
                 id = operationResult.resourceLocation.Split("/")[2];
