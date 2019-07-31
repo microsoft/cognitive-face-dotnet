@@ -14,6 +14,6 @@ namespace FaceClientSDK.Interfaces
 
         Task<VerifyResult> VerifyAsync(string faceId1, string faceId2, string faceId, string personGroupId, string largePersonGroupId, string personId);
 
-        Task<IdentifyResult> IdentifyAsync(string largePersonGroupId, string[] faceIds, int maxNumOfCandidatesReturned, double confidenceThreshold);
+        Task<List<IdentifyResult>> IdentifyAsync(string largePersonGroupId, string[] faceIds, int maxNumOfCandidatesReturned, double confidenceThreshold);
     }
 }
