@@ -215,13 +215,12 @@ namespace FaceClientSDK.Tests
                 takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
                 while (true)
                 {
+                    Task.Delay(1000).Wait();
                     result = await ApiReference.Instance.Snapshot.GetOperationStatusAsync(takeSnapshotResult.OperationLocation);
                     if (result.status != "running")
                     {
                         break;
                     }
-                    Task.Delay(1000).Wait();
-
                 }
 
             }
