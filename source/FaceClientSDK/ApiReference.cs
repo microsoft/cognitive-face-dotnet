@@ -1,20 +1,19 @@
-﻿using FaceClientSDK.Interfaces;
-using FaceClientSDK.Domain;
-using DomainFace = FaceClientSDK.Domain.Face;
-using DomainFaceList = FaceClientSDK.Domain.FaceList;
+﻿using FaceClientSDK.Domain;
+using FaceClientSDK.Interfaces;
+using FacehttpClientSDK;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using DomainLargeFaceList = FaceClientSDK.Domain.LargeFaceList;
 using DomainLargePersonGroup = FaceClientSDK.Domain.LargePersonGroup;
 using DomainLargePersonGroupPerson = FaceClientSDK.Domain.LargePersonGroupPerson;
 using DomainPersonGroup = FaceClientSDK.Domain.PersonGroup;
 using DomainPersonGroupPerson = FaceClientSDK.Domain.PersonGroupPerson;
 using DomainSnapshot = FaceClientSDK.Domain.Snapshot;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace FaceClientSDK
 {
@@ -25,8 +24,10 @@ namespace FaceClientSDK
 
         public static string FaceAPIKey { get; set; }
         public static string FaceAPIZone { get; set; }
-        public Face Face { get; set; } = Face.Instance;
-        public FaceList FaceList { get; set; } = FaceList.Instance;
+        public static HttpClient HttpClient { get; set; }
+
+        public Face Face => new Face(HttpClient);
+        public FaceList FaceList => new FaceList(HttpClient);
         public LargeFaceList LargeFaceList { get; set; } = LargeFaceList.Instance;
         public LargePersonGroup LargePersonGroup { get; set; } = LargePersonGroup.Instance;
         public LargePersonGroupPerson LargePersonGroupPerson { get; set; } = LargePersonGroupPerson.Instance;
@@ -34,7 +35,7 @@ namespace FaceClientSDK
         public PersonGroupPerson PersonGroupPerson { get; set; } = PersonGroupPerson.Instance;
         public Snapshot Snapshot { get; set; } = Snapshot.Instance;
 
-        ApiReference()
+        private ApiReference()
         {
         }
 
@@ -54,431 +55,12 @@ namespace FaceClientSDK
         }
     }
 
-    public class Face : IFace
-    {
-        private static Face instance = null;
-        private static readonly object padlock = new object();
-
-        Face()
-        {
-            if (string.IsNullOrEmpty(ApiReference.FaceAPIKey))
-                throw new ArgumentException(message: "FaceAPIKey required by: ApiReference.FaceAPIKey");
-
-            if (string.IsNullOrEmpty(ApiReference.FaceAPIZone))
-                throw new ArgumentException(message: "FaceAPIZone required by: ApiReference.FaceAPIZone");
-        }
-
-        public static Face Instance
-        {
-            get
-            {
-                lock (padlock)
-                {
-                    if (instance == null)
-                    {
-                        instance = new Face();
-                    }
-                    return instance;
-                }
-            }
-        }
-
-        public async Task<List<DomainFace.DetectResult>> DetectAsync(string url, string returnFaceAttributes, bool returnFaceId = false, bool returnFaceLandmarks = false)
-        {
-            dynamic body = new JObject();
-            body.url = url;
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
-
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/detect?returnFaceId={returnFaceId}&returnFaceLandmarks={returnFaceLandmarks}&returnFaceAttributes={returnFaceAttributes}", queryString);
-
-                List<DomainFace.DetectResult> result = null;
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<List<DomainFace.DetectResult>>(json);
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-        }
-
-        public async Task<List<DomainFace.FindSimilarResult>> FindSimilarAsync(string faceId, string faceListId, string largeFaceListId, string[] faceIds, int maxNumOfCandidatesReturned, string mode)
-        {
-            dynamic body = new JObject();
-            body.faceId = faceId;
-
-            if (faceListId != string.Empty)
-                body.faceListId = faceListId;
-
-            if (largeFaceListId != string.Empty)
-                body.largeFaceListId = largeFaceListId;
-
-            if (faceIds.Length > 0)
-                body.faceIds = JArray.FromObject(faceIds);
-
-            body.maxNumOfCandidatesReturned = maxNumOfCandidatesReturned;
-            body.mode = mode;
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
-
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/findsimilars", queryString);
-
-                List<DomainFace.FindSimilarResult> result = null;
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<List<DomainFace.FindSimilarResult>>(json);
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-        }
-
-        public async Task<DomainFace.VerifyResult> VerifyAsync(string faceId1, string faceId2, string faceId, string personGroupId, string largePersonGroupId, string personId)
-        {
-            dynamic body = new JObject();
-
-            if (faceId1 != string.Empty)
-                body.faceId1 = faceId1;
-
-            if (faceId2 != string.Empty)
-                body.faceId2 = faceId2;
-
-            if (faceId != string.Empty)
-                body.faceId = faceId;
-
-            if (personGroupId != string.Empty)
-                body.personGroupId = personGroupId;
-
-            if (largePersonGroupId != string.Empty)
-                body.largePersonGroupId = largePersonGroupId;
-
-            if (personId != string.Empty)
-                body.personId = personId;
-
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
-
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/verify", queryString);
-
-                DomainFace.VerifyResult result = null;
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<DomainFace.VerifyResult>(json);
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-        }
-
-        public async Task<DomainFace.GroupResult> GroupAsync(string[] faceIds)
-        {
-            dynamic body = new JObject();
-
-            if (faceIds.Length > 0)
-                body.faceIds = JArray.FromObject(faceIds);
-
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
-
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/group", queryString);
-
-                DomainFace.GroupResult result = null;
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<DomainFace.GroupResult>(json);
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-
-        }
-
-        public async Task<List<DomainFace.IdentifyResult>> IdentifyAsync(string largePersonGroupId, string[] faceIds, int maxNumOfCandidatesReturned, double confidenceThreshold)
-        {
-            dynamic body = new JObject();
-
-            if (largePersonGroupId != string.Empty)
-                body.largePersonGroupId = largePersonGroupId;
-
-            if (faceIds.Length > 0)
-                body.faceIds = JArray.FromObject(faceIds);
-
-            body.maxNumOfCandidatesReturned = maxNumOfCandidatesReturned;
-            body.confidenceThreshold = confidenceThreshold;
-
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
-
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/identify", queryString);
-
-                List<DomainFace.IdentifyResult> result = null;
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<List<DomainFace.IdentifyResult>>(json);
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-        }
-    }
-
-    public class FaceList : IFaceList
-    {
-        private static FaceList instance = null;
-        private static readonly object padlock = new object();
-
-        FaceList()
-        {
-            if (string.IsNullOrEmpty(ApiReference.FaceAPIKey))
-                throw new ArgumentException(message: "FaceAPIKey required by: ApiReference.FaceAPIKey");
-
-            if (string.IsNullOrEmpty(ApiReference.FaceAPIZone))
-                throw new ArgumentException(message: "FaceAPIZone required by: ApiReference.FaceAPIZone");
-        }
-
-        public static FaceList Instance
-        {
-            get
-            {
-                lock (padlock)
-                {
-                    if (instance == null)
-                    {
-                        instance = new FaceList();
-                    }
-                    return instance;
-                }
-            }
-        }
-
-        public async Task<DomainFaceList.AddFaceResult> AddFaceAsync(string faceListId, string url, string userData, string targetFace)
-        {
-            dynamic body = new JObject();
-            body.url = url;
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
-
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.PostAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/facelists/{faceListId}/persistedFaces?userData={userData}&targetFace={targetFace}", queryString);
-
-                DomainFaceList.AddFaceResult result = null;
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<DomainFaceList.AddFaceResult>(json);
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-        }
-
-        public async Task<bool> CreateAsync(string faceListId, string name, string userData)
-        {
-            dynamic body = new JObject();
-            body.name = name;
-            body.userData = userData;
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
-
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.PutAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/facelists/{faceListId}", queryString);
-
-                bool result = false;
-                if (response.IsSuccessStatusCode)
-                {
-                    result = true;
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-                return result;
-            }
-        }
-
-        public async Task<bool> DeleteAsync(string faceListId)
-        {
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.DeleteAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/facelists/{faceListId}");
-
-                bool result = false;
-                if (response.IsSuccessStatusCode)
-                {
-                    result = true;
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-                return result;
-            }
-        }
-
-        public async Task<bool> DeleteFaceAsync(string faceListId, string persistedFaceId)
-        {
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.DeleteAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/facelists/{faceListId}/persistedfaces/{persistedFaceId}");
-
-                bool result = false;
-                if (response.IsSuccessStatusCode)
-                {
-                    result = true;
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-        }
-
-        public async Task<DomainFaceList.GetResult> GetAsync(string faceListId)
-        {
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.GetAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/facelists/{faceListId}");
-
-                DomainFaceList.GetResult result = null;
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<DomainFaceList.GetResult>(json);
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-        }
-
-        public async Task<List<DomainFaceList.ListResult>> ListAsync()
-        {
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.GetAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/facelists");
-
-                List<DomainFaceList.ListResult> result = null;
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<List<DomainFaceList.ListResult>>(json);
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-        }
-
-        public async Task<bool> UpdateAsync(string faceListId, string name, string userData)
-        {
-            dynamic body = new JObject();
-            body.name = name;
-            body.userData = userData;
-            StringContent queryString = new StringContent(body.ToString(), System.Text.Encoding.UTF8, "application/json");
-
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
-                var response = await client.PatchAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/facelists/{faceListId}", queryString);
-
-                bool result = false;
-                if (response.IsSuccessStatusCode)
-                {
-                    result = true;
-                }
-                else
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    NotSuccessfulResponse fex = JsonConvert.DeserializeObject<NotSuccessfulResponse>(json);
-                    throw new NotSuccessfulException($"{fex.error.code} - {fex.error.message}");
-                }
-
-                return result;
-            }
-        }
-    }
-
     public class LargeFaceList : ILargeFaceList
     {
         private static LargeFaceList instance = null;
         private static readonly object padlock = new object();
 
-        LargeFaceList()
+        private LargeFaceList()
         {
             if (string.IsNullOrEmpty(ApiReference.FaceAPIKey))
                 throw new ArgumentException(message: "FaceAPIKey required by: ApiReference.FaceAPIKey");
@@ -809,7 +391,7 @@ namespace FaceClientSDK
         private static LargePersonGroup instance = null;
         private static readonly object padlock = new object();
 
-        LargePersonGroup()
+        private LargePersonGroup()
         {
             if (string.IsNullOrEmpty(ApiReference.FaceAPIKey))
                 throw new ArgumentException(message: "FaceAPIKey required by: ApiReference.FaceAPIKey");
@@ -1014,7 +596,7 @@ namespace FaceClientSDK
         private static LargePersonGroupPerson instance = null;
         private static readonly object padlock = new object();
 
-        LargePersonGroupPerson()
+        private LargePersonGroupPerson()
         {
             if (string.IsNullOrEmpty(ApiReference.FaceAPIKey))
                 throw new ArgumentException(message: "FaceAPIKey required by: ApiReference.FaceAPIKey");
@@ -1272,7 +854,7 @@ namespace FaceClientSDK
         private static PersonGroup instance = null;
         private static readonly object padlock = new object();
 
-        PersonGroup()
+        private PersonGroup()
         {
             if (string.IsNullOrEmpty(ApiReference.FaceAPIKey))
                 throw new ArgumentException(message: "FaceAPIKey required by: ApiReference.FaceAPIKey");
@@ -1477,7 +1059,7 @@ namespace FaceClientSDK
         private static PersonGroupPerson instance = null;
         private static readonly object padlock = new object();
 
-        PersonGroupPerson()
+        private PersonGroupPerson()
         {
             if (string.IsNullOrEmpty(ApiReference.FaceAPIKey))
                 throw new ArgumentException(message: "FaceAPIKey required by: ApiReference.FaceAPIKey");
@@ -1730,12 +1312,12 @@ namespace FaceClientSDK
         }
     }
 
-    public class Snapshot: ISnapshot
+    public class Snapshot : ISnapshot
     {
         private static Snapshot instance = null;
         private static readonly object padlock = new object();
 
-        Snapshot()
+        private Snapshot()
         {
             if (string.IsNullOrEmpty(ApiReference.FaceAPIKey))
                 throw new ArgumentException(message: "FaceAPIKey required by: ApiReference.FaceAPIKey");
@@ -1758,7 +1340,7 @@ namespace FaceClientSDK
                 }
             }
         }
-    
+
         public async Task<bool> ApplyAsync(string snapshotId, string objectId, string mode)
         {
             dynamic body = new JObject();
@@ -1785,7 +1367,7 @@ namespace FaceClientSDK
                 return result;
             }
         }
-       
+
         public async Task<bool> DeleteAsync(string snapshotId)
         {
             using (var client = new HttpClient())
@@ -1807,7 +1389,7 @@ namespace FaceClientSDK
                 return result;
             }
         }
-        
+
         public async Task<DomainSnapshot.GetResult> GetAsync(string snapshotId)
         {
             using (var client = new HttpClient())
@@ -1831,7 +1413,7 @@ namespace FaceClientSDK
                 return result;
             }
         }
-        
+
         public async Task<DomainSnapshot.GetOperationStatusResult> GetOperationStatusAsync(string snapshotId)
         {
             using (var client = new HttpClient())
@@ -1863,7 +1445,7 @@ namespace FaceClientSDK
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ApiReference.FaceAPIKey);
                 var response = await client.GetAsync($"https://{ApiReference.FaceAPIZone}.api.cognitive.microsoft.com/face/v1.0/snapshots?type={type}&applyScope={applyScope}");
 
-                List <DomainSnapshot.ListResult> result = null;
+                List<DomainSnapshot.ListResult> result = null;
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
@@ -1885,9 +1467,9 @@ namespace FaceClientSDK
             dynamic body = new JObject();
             body.type = type;
             body.objectId = objectId;
-            var jSonArray = JsonConvert.SerializeObject(applyScope);            
+            var jSonArray = JsonConvert.SerializeObject(applyScope);
             body.applyScope = JArray.Parse(jSonArray);
-            body.userData = userData;                     
+            body.userData = userData;
             StringContent queryString = new StringContent(JsonConvert.SerializeObject(body), System.Text.Encoding.UTF8, "application/json");
 
             using (var client = new HttpClient())
@@ -1897,7 +1479,7 @@ namespace FaceClientSDK
 
                 DomainSnapshot.TakeResult result = null;
                 if (response.IsSuccessStatusCode)
-                {                   
+                {
                     result = new DomainSnapshot.TakeResult { OperationLocation = response.Headers.GetValues("Operation-Location").First().Split("/")[2] };
                 }
                 else

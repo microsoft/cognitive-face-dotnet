@@ -12,7 +12,6 @@ namespace FaceClientSDK.Tests.Fixtures
         public string TestGroupImageUrl { get; set; }
         public string SubscriptionID { get; set; }
 
-
         public FaceAPISettingsFixture()
         {
             var config = new ConfigurationBuilder()
@@ -24,7 +23,7 @@ namespace FaceClientSDK.Tests.Fixtures
             FaceAPIZone = config.GetSection("general:FaceAPIZone").Value;
             TestImageUrl = config.GetSection("general:TestImageUrl").Value;
             TestGroupImageUrl = config.GetSection("general:TestGroupImageUrl").Value;
-            SubscriptionID= config.GetSection("general:SubscriptionId").Value;
+            SubscriptionID = config.GetSection("general:SubscriptionId").Value;
         }
 
         public void Dispose()

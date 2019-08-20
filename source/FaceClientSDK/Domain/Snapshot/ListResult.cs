@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FaceClientSDK.Domain.Snapshot
 {
     public class ListResult
     {
-        
         public string id { get; set; }
 
         public string account { get; set; }

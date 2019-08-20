@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using FaceClientSDK.Domain.Snapshot;
+﻿using FaceClientSDK.Domain.Snapshot;
 using FaceClientSDK.Tests.Fixtures;
-using Xunit;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using ListResult = FaceClientSDK.Domain.Snapshot.ListResult;
-using GetResult = FaceClientSDK.Domain.Snapshot.GetResult;
 using System.Threading.Tasks;
+using Xunit;
+using GetResult = FaceClientSDK.Domain.Snapshot.GetResult;
+using ListResult = FaceClientSDK.Domain.Snapshot.ListResult;
 
 namespace FaceClientSDK.Tests
 {
@@ -19,6 +16,7 @@ namespace FaceClientSDK.Tests
         private string identifier = null;
         private string[] applyScope = null;
         private string SubscriptionID = null;
+
         public SnapshotTests(FaceAPISettingsFixture fixture)
         {
             faceAPISettingsFixture = fixture;
@@ -33,8 +31,8 @@ namespace FaceClientSDK.Tests
             guidArray[1] = Guid.NewGuid();
             guidArray[2] = Guid.NewGuid();
 
-            applyScope = Array.ConvertAll(guidArray, x => x.ToString());            
-        }       
+            applyScope = Array.ConvertAll(guidArray, x => x.ToString());
+        }
 
         [Fact]
         public async void TakeAsync()
@@ -42,13 +40,13 @@ namespace FaceClientSDK.Tests
             bool result = false;
             TakeResult takeSnapshotResult = null;
             var objectType = "PersonGroup";
-            GetOperationStatusResult operationResult=null;
-            
+            GetOperationStatusResult operationResult = null;
+
             //Add PersonGroup to transfer
             try
             {
                 result = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
-                takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);                
+                takeSnapshotResult = await ApiReference.Instance.Snapshot.TakeAsync(objectType, identifier, applyScope, identifier);
                 while (true)
                 {
                     System.Threading.Tasks.Task.Delay(1000).Wait();
@@ -59,32 +57,31 @@ namespace FaceClientSDK.Tests
                         break;
                     }
                 }
-
             }
             catch (Exception)
             {
                 throw;
-            }          
-           finally
+            }
+            finally
             {
                 var id = operationResult.resourceLocation.Split("/")[2];
-                var deleted = DeleteResources(identifier, id);               
+                var deleted = DeleteResources(identifier, id);
             }
 
-            Assert.True(takeSnapshotResult!=null);
+            Assert.True(takeSnapshotResult != null);
         }
+
         [Fact]
         public async void ApplyAsync()
         {
             bool resultPersonGroup = false;
             var objectType = "PersonGroup";
             var mode = "CreateNew";
-            TakeResult takeSnapshotResult = null;          
+            TakeResult takeSnapshotResult = null;
             GetOperationStatusResult operationResult = null;
             string id = null;
             applyScope[2] = SubscriptionID;
             bool applySnapshot_result = false;
-
 
             try
             {
@@ -104,28 +101,25 @@ namespace FaceClientSDK.Tests
                 }
                 id = operationResult.resourceLocation.Split("/")[2];
                 applySnapshot_result = await ApiReference.Instance.Snapshot.ApplyAsync(id, "new" + identifier, mode);
-
             }
             catch (Exception)
             {
-
                 throw;
             }
             finally
             {
                 var deleted = DeleteResources(identifier, id);
             }
-                Assert.True(applySnapshot_result);
-
+            Assert.True(applySnapshot_result);
         }
 
-        [Fact]    
+        [Fact]
         public async void DeleteAsync()
         {
             bool result = false;
             bool resultPersonGroup = false;
             var objectType = "PersonGroup";
-            TakeResult takeSnapshotResult = null;                   
+            TakeResult takeSnapshotResult = null;
             GetOperationStatusResult operationResult = null;
             string id = null;
 
@@ -164,12 +158,11 @@ namespace FaceClientSDK.Tests
             bool resultPersonGroup = false;
             var objectType = "PersonGroup";
             GetResult result = null;
-            TakeResult takeSnapshotResult = null;            
+            TakeResult takeSnapshotResult = null;
             GetOperationStatusResult operationResult = null;
             string id = null;
-           
 
-            //Add PersonGroup and Take Operation 
+            //Add PersonGroup and Take Operation
             try
             {
                 resultPersonGroup = await ApiReference.Instance.PersonGroup.CreateAsync(identifier, identifier, identifier);
@@ -193,12 +186,11 @@ namespace FaceClientSDK.Tests
                 throw;
             }
             finally
-            {               
+            {
                 var deleted = DeleteResources(identifier, id);
             }
 
             Assert.True(result != null);
-
         }
 
         [Fact]
@@ -222,20 +214,18 @@ namespace FaceClientSDK.Tests
                         break;
                     }
                 }
-
             }
             catch
             {
                 throw;
             }
             finally
-            {                
+            {
                 var id = result.resourceLocation.Split("/")[2];
                 var deleted = DeleteResources(identifier, id);
             }
 
             Assert.True(result != null);
-
         }
 
         [Fact]
@@ -245,7 +235,7 @@ namespace FaceClientSDK.Tests
             var objectType = "PersonGroup";
             try
             {
-                result = await ApiReference.Instance.Snapshot.ListAsync(objectType,String.Empty);
+                result = await ApiReference.Instance.Snapshot.ListAsync(objectType, String.Empty);
             }
             catch
             {
@@ -253,8 +243,7 @@ namespace FaceClientSDK.Tests
             }
 
             Assert.True(result != null);
-
-        }       
+        }
 
         [Fact]
         public async void UpdateAsync()
@@ -295,10 +284,10 @@ namespace FaceClientSDK.Tests
             }
 
             Assert.True(result);
-        }  
-        
+        }
+
         public async Task<bool> DeleteResources(string identifier, string id)
-        {           
+        {
             //Delete PersonGroup
             var deletion_result = await ApiReference.Instance.PersonGroup.DeleteAsync(identifier);
             //Delete Take
@@ -309,6 +298,5 @@ namespace FaceClientSDK.Tests
             else
                 return false;
         }
-
     }
 }

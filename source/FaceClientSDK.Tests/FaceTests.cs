@@ -1,205 +1,181 @@
 using FaceClientSDK.Domain.Face;
-using FaceClientSDK.Domain.LargePersonGroupPerson;
-using FaceClientSDK.Tests.Fixtures;
+using Moq;
+using Moq.Protected;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
-using DomainFaceList = FaceClientSDK.Domain.FaceList;
-using DomainLargePersonGroupPerson = FaceClientSDK.Domain.LargePersonGroupPerson;
 
 namespace FaceClientSDK.Tests
 {
-    public class FaceTests : IClassFixture<FaceAPISettingsFixture>
+    public class FaceTests : IDisposable
     {
-        private FaceAPISettingsFixture faceAPISettingsFixture = null;
-
-        public FaceTests(FaceAPISettingsFixture fixture)
+        public FaceTests()
         {
-            faceAPISettingsFixture = fixture;
+            ApiReference.FaceAPIKey = "face_api_key";
+            ApiReference.FaceAPIZone = "face_api_zone";
+        }
 
-            ApiReference.FaceAPIKey = faceAPISettingsFixture.FaceAPIKey;
-            ApiReference.FaceAPIZone = faceAPISettingsFixture.FaceAPIZone;
+        public void Dispose()
+        {
         }
 
         [Fact]
         public async void DetectAsyncTest()
         {
-            List<DetectResult> result = null;
+            List<DetectResult> objresult = new List<DetectResult>();
+            DetectResult detectResult = new DetectResult();
+            detectResult.faceId = Guid.NewGuid().ToString();
+            objresult.Add(detectResult);
+            var jsonResult = JsonConvert.SerializeObject(objresult);
 
-            try
-            {
-                result = await ApiReference.Instance.Face.DetectAsync(faceAPISettingsFixture.TestImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
-            }
-            catch
-            {
-                throw;
-            }
+            var handlerMock = new Mock<HttpClientHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(jsonResult),
+                })
 
-            Assert.True(result != null);
+                .Verifiable();
+
+            ApiReference.HttpClient = new HttpClient(handlerMock.Object);
+            var result = await ApiReference.Instance.Face.DetectAsync("url", "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
+
+            Assert.Equal(detectResult.faceId, result[0].faceId);
         }
 
         [Fact]
         public async void FindSimilarAsyncTest()
         {
-            List<FindSimilarResult> result = null;
-            var identifier = System.Guid.NewGuid().ToString();
+            List<FindSimilarResult> objresult = new List<FindSimilarResult>();
+            FindSimilarResult findSimilarResult = new FindSimilarResult();
+            findSimilarResult.faceId = System.Guid.NewGuid().ToString();
+            objresult.Add(findSimilarResult);
+            var jsonResult = JsonConvert.SerializeObject(objresult);
 
-            try
-            {
-                var creation_result = await ApiReference.Instance.FaceList.CreateAsync(identifier, identifier, identifier);
-
-                DomainFaceList.AddFaceResult addface_result = null;
-                if (creation_result)
+            var handlerMock = new Mock<HttpClientHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage()
                 {
-                    dynamic jUserData = new JObject();
-                    jUserData.UserDataSample = "User Data Sample";
-                    var rUserData = JsonConvert.SerializeObject(jUserData);
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(jsonResult),
+                })
 
-                    addface_result = await ApiReference.Instance.FaceList.AddFaceAsync(identifier, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                .Verifiable();
 
-                    if (addface_result != null)
-                    {
-                        List<DetectResult> detection_result = await ApiReference.Instance.Face.DetectAsync(faceAPISettingsFixture.TestImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
+            ApiReference.HttpClient = new HttpClient(handlerMock.Object);
+            var result = await ApiReference.Instance.Face.FindSimilarAsync("faceId", "faceListId", string.Empty, new string[] { }, 10, "matchPerson");
 
-                        if (detection_result != null)
-                            result = await ApiReference.Instance.Face.FindSimilarAsync(detection_result[0].faceId, identifier, string.Empty, new string[] { }, 10, "matchPerson");
-                    }
-                }
-            }
-            catch
-            {
-                throw;
-            }
-            finally
-            {
-                var deletion_result = await ApiReference.Instance.FaceList.DeleteAsync(identifier);
-            }
-
-            Assert.True(result != null);
+            Assert.Equal(findSimilarResult.faceId, result[0].faceId);
         }
 
         [Fact]
         public async void VerifyAsyncTest()
         {
-            VerifyResult result = null;
-            var identifier = System.Guid.NewGuid().ToString();
-            var personId = string.Empty;
-            try
-            {
-                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(identifier, identifier, identifier);
+            VerifyResult objresult = new VerifyResult();
+            objresult.isIdentical = true;
+            var jsonResult = JsonConvert.SerializeObject(objresult);
 
-                var creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(identifier, identifier, identifier);
-                personId = creation_person_result.personId;
-
-                DomainLargePersonGroupPerson.AddFaceResult addface_result = null;
-                if (creation_group_result)
+            var handlerMock = new Mock<HttpClientHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage()
                 {
-                    dynamic jUserData = new JObject();
-                    jUserData.UserDataSample = "User Data Sample";
-                    var rUserData = JsonConvert.SerializeObject(jUserData);
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(jsonResult),
+                })
 
-                    addface_result = await ApiReference.Instance.LargePersonGroupPerson.AddFaceAsync(identifier, personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+                .Verifiable();
 
-                    if (addface_result != null)
-                    {
-                        List<DetectResult> detection_result = await ApiReference.Instance.Face.DetectAsync(faceAPISettingsFixture.TestImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
+            ApiReference.HttpClient = new HttpClient(handlerMock.Object);
+            var result = await ApiReference.Instance.Face.VerifyAsync(string.Empty, string.Empty, "faceId", string.Empty, "largePersonGroupId", "personId");
 
-                        if (detection_result != null)
-                        {
-                            result = await ApiReference.Instance.Face.VerifyAsync(string.Empty, string.Empty, detection_result[0].faceId, string.Empty, identifier, personId);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                throw;
-            }
-            finally
-            {
-                var deletion_person_result = await ApiReference.Instance.LargePersonGroupPerson.DeleteAsync(identifier, personId);
-                var deletion_group_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(identifier);
-            }
-
-            Assert.True(result != null);
+            Assert.Equal(objresult.isIdentical, result.isIdentical);
         }
 
         [Fact]
         public async void GroupAsyncTest()
         {
-            List<DetectResult> detectResult = null;
-            GroupResult groupResult = null;
+            GroupResult objresult = new GroupResult();
+            objresult.groups = new List<List<string>>();
+            List<string> l1 = new List<string>();
+            l1.Add("group");
+            objresult.groups.Add(l1);
+            var jsonResult = JsonConvert.SerializeObject(objresult);
 
-            try
-            {
-                detectResult = await ApiReference.Instance.Face.DetectAsync(faceAPISettingsFixture.TestGroupImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
-                if (detectResult.Count > 0)
+            var handlerMock = new Mock<HttpClientHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage()
                 {
-                    groupResult = await ApiReference.Instance.Face.GroupAsync((from result in detectResult select result.faceId).ToArray());
-                }
-            }
-            catch
-            {
-                throw;
-            }
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(jsonResult),
+                })
 
-            Assert.True(groupResult != null);
+                .Verifiable();
+
+            ApiReference.HttpClient = new HttpClient(handlerMock.Object);
+            var groupResult = await ApiReference.Instance.Face.GroupAsync(new string[] { });
+
+            Assert.Equal("group", groupResult.groups[0][0]);
         }
 
         [Fact]
         public async void IdentifyAsyncTest()
         {
-            bool resultTrainLargePersonGroup = false;
-            AddFaceResult add_face_result = null;
-            CreateResult creation_person_result = null;
-            List<DetectResult> face_detect_result = null;
+            List<IdentifyResult> objresult = new List<IdentifyResult>();
+            IdentifyResult identifyResult = new IdentifyResult();
+            identifyResult.faceId = Guid.NewGuid().ToString();
+            objresult.Add(identifyResult);
+            var jsonResult = JsonConvert.SerializeObject(objresult);
 
-            List<IdentifyResult> result = null;
-            var largePersonGroupId = System.Guid.NewGuid().ToString();
-            
-            try
-            {
-
-                var creation_group_result = await ApiReference.Instance.LargePersonGroup.CreateAsync(largePersonGroupId, "person-group-name", "recognition_02");
-
-                if (creation_group_result)
+            var handlerMock = new Mock<HttpClientHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage()
                 {
-                    creation_person_result = await ApiReference.Instance.LargePersonGroupPerson.CreateAsync(largePersonGroupId, "person-name", "User-provided data attached to the person.");
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(jsonResult),
+                })
 
-                    dynamic jUserData = new JObject();
-                    jUserData.UserDataSample = "User Data Sample";
-                    var rUserData = JsonConvert.SerializeObject(jUserData);
+                .Verifiable();
 
-                    add_face_result = await ApiReference.Instance.LargePersonGroupPerson.AddFaceAsync(largePersonGroupId, creation_person_result.personId, faceAPISettingsFixture.TestImageUrl, rUserData, string.Empty);
+            ApiReference.HttpClient = new HttpClient(handlerMock.Object);
+            var result = await ApiReference.Instance.Face.IdentifyAsync("largePersonGroupId", new string[] { }, 1, 0);
 
-
-                    resultTrainLargePersonGroup = await ApiReference.Instance.LargePersonGroup.TrainAsync(largePersonGroupId);
-
-                    while (true)
-                    {
-                        System.Threading.Tasks.Task.Delay(1000).Wait();
-                        var status = await ApiReference.Instance.LargePersonGroup.GetTrainingStatusAsync(largePersonGroupId);
-
-                        if (status.status != "running")
-                        {
-                            break;
-                        }
-                    }
-                    face_detect_result = await ApiReference.Instance.Face.DetectAsync(faceAPISettingsFixture.TestImageUrl, "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise", true, true);
-                    result = await ApiReference.Instance.Face.IdentifyAsync(largePersonGroupId, new[] { face_detect_result[0].faceId }, 1, 0);
-                }
-            }
-            catch
-            {
-                throw;
-            }
-            finally
-            {
-                var deletion_result = await ApiReference.Instance.LargePersonGroup.DeleteAsync(largePersonGroupId);
-            }
-            Assert.True(result != null);
+            Assert.Equal(identifyResult.faceId, result[0].faceId);
         }
     }
 }

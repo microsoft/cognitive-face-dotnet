@@ -223,7 +223,7 @@ namespace FaceClientSDK.Tests
                                     break;
                                 }
                             }
-                        }                            
+                        }
                     }
                 }
             }
